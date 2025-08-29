@@ -1,0 +1,133 @@
+/* Reply screen styles */
+.reply-screen {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 1000;
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+  .reply-screen {
+    width: 400px;
+  }
+}
+
+.reply-screen.active {
+  right: 0;
+}
+
+.reply-screen-header {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #4f46e5;
+  color: white;
+}
+
+.reply-screen-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.reply-screen-header h3 {
+  margin: 0;
+}
+
+.reply-screen-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+.reply-original-message {
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  max-height: 40%;
+  overflow-y: auto;
+}
+
+.reply-author {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #4f46e5;
+}
+
+.reply-content {
+  word-break: break-word;
+}
+
+.reply-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+}
+
+.reply-input-container {
+  display: flex;
+  margin-top: auto;
+  padding: 10px 0;
+}
+
+.reply-input-container input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.reply-input-container button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Theme-specific styles */
+.theme-blue .reply-screen-header,
+.theme-blue .reply-input-container button {
+  background-color: #2563eb;
+}
+
+.theme-green .reply-screen-header,
+.theme-green .reply-input-container button {
+  background-color: #059669;
+}
+
+.theme-purple .reply-screen-header,
+.theme-purple .reply-input-container button {
+  background-color: #7c3aed;
+}
+
+.theme-dark .reply-screen-header,
+.theme-dark .reply-input-container button {
+  background-color: #1f2937;
+}
+
+.theme-dark .reply-original-message {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+.theme-sunset .reply-screen-header,
+.theme-sunset .reply-input-container button {
+  background-color: #ea580c;
+}

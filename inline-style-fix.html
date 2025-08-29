@@ -1,0 +1,57 @@
+<!-- Add this to your index.html file -->
+<style>
+/* Direct inline style fix for message text */
+.message p {
+  color: #000000 !important;
+  background-color: transparent !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  text-shadow: none !important;
+}
+
+.message.received p {
+  color: #000000 !important;
+  font-weight: normal !important;
+}
+
+.message.sent p {
+  color: #ffffff !important;
+  font-weight: normal !important;
+}
+
+/* Fix for dark theme */
+.theme-dark .message.received p {
+  color: #ffffff !important;
+}
+
+/* Fix for message content */
+.message-container {
+  color: #000000 !important;
+}
+</style>
+
+<script>
+// Add this to ensure text is visible
+window.addEventListener('DOMContentLoaded', function() {
+  // Fix all message text immediately
+  fixAllMessageText();
+  
+  // Set interval to keep checking and fixing
+  setInterval(fixAllMessageText, 1000);
+  
+  function fixAllMessageText() {
+    document.querySelectorAll('.message p').forEach(function(p) {
+      p.setAttribute('style', 'color: #000000 !important; visibility: visible !important; opacity: 1 !important; display: block !important;');
+    });
+    
+    document.querySelectorAll('.message.received p').forEach(function(p) {
+      p.setAttribute('style', 'color: #000000 !important; visibility: visible !important; opacity: 1 !important; display: block !important;');
+    });
+    
+    document.querySelectorAll('.message.sent p').forEach(function(p) {
+      p.setAttribute('style', 'color: #ffffff !important; visibility: visible !important; opacity: 1 !important; display: block !important;');
+    });
+  }
+});
+</script>

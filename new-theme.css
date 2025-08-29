@@ -1,0 +1,202 @@
+/* New theme with updated colors and removal of blinking sky blue box */
+:root {
+  /* New color scheme */
+  --primary-color: #6d28d9;      /* Purple instead of blue */
+  --primary-light: #a78bfa;
+  --primary-dark: #4c1d95;
+  --accent-color: #059669;       /* Green accent */
+  --text-light: #f9fafb;
+  --text-dark: #1f2937;
+  --bg-light: #f3f4f6;
+  --bg-dark: #1f2937;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --transition: all 0.3s ease;
+}
+
+/* Remove any blinking animations */
+* {
+  animation: none !important;
+}
+
+/* Modern container styling */
+.container {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: var(--transition);
+  background-color: var(--bg-light);
+}
+
+/* Enhanced header */
+.header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  padding: 15px 20px;
+  box-shadow: var(--shadow-md);
+  color: var(--text-light);
+}
+
+/* Message styling */
+.message {
+  border-radius: var(--radius-md) !important;
+  padding: 12px 16px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  margin-bottom: 12px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.message.sent {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
+  color: var(--text-light) !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.message.received {
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
+  color: var(--text-dark) !important;
+  border-bottom-left-radius: 4px !important;
+  border-left: none !important; /* Remove any border that might be causing the blue line */
+}
+
+/* Chat area styling */
+.chat-area {
+  background-color: var(--bg-light) !important;
+  background-image: 
+    radial-gradient(circle at 25px 25px, rgba(0,0,0,0.01) 2%, transparent 0%), 
+    radial-gradient(circle at 75px 75px, rgba(0,0,0,0.01) 2%, transparent 0%);
+  background-size: 100px 100px;
+  padding: 15px !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+/* Input styling */
+.message-input input {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 12px 16px !important;
+  transition: var(--transition) !important;
+  box-shadow: var(--shadow-sm) !important;
+  background-color: white !important;
+}
+
+.message-input input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2) !important;
+  outline: none !important;
+}
+
+/* Button styling */
+.button {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-light) !important;
+}
+
+.button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Fix for message text */
+.message p {
+  color: inherit !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  text-shadow: none !important;
+}
+
+.message.sent p {
+  color: var(--text-light) !important;
+  font-weight: normal !important;
+}
+
+.message.received p {
+  color: var(--text-dark) !important;
+  font-weight: normal !important;
+}
+
+/* Fix for username visibility */
+.message strong {
+  color: inherit !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  font-weight: bold !important;
+  font-size: 0.9em !important;
+  margin-bottom: 5px !important;
+  text-shadow: none !important;
+}
+
+.message.sent strong {
+  color: var(--text-light) !important;
+}
+
+.message.received strong {
+  color: var(--text-dark) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Reply container styling */
+.reply-container {
+  background: rgba(109, 40, 217, 0.1) !important;
+  border-left: 3px solid var(--primary-color) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px 12px !important;
+}
+
+/* Toast notification styling */
+.toast {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--text-light) !important;
+}
+
+/* Typing indicator styling */
+.typing-indicator {
+  color: var(--primary-color) !important;
+  font-style: italic;
+}
+
+/* Drop zone styling */
+#dropZone {
+  border: 2px dashed var(--primary-light) !important;
+  background-color: rgba(109, 40, 217, 0.05) !important;
+  transition: var(--transition) !important;
+}
+
+#dropZone.active {
+  border-color: var(--primary-color) !important;
+  background-color: rgba(109, 40, 217, 0.1) !important;
+}

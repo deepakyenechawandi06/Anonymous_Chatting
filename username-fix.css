@@ -1,0 +1,26 @@
+.message strong {
+  color: #000000 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  font-weight: bold !important;
+  font-size: 0.9em !important;
+  margin-bottom: 5px !important;
+  text-shadow: none !important;
+}
+
+.message.sent strong {
+  color: #ffffff !important;
+}
+
+.message.received strong {
+  color: #000000 !important;
+}
+
+.theme-dark .message.received strong {
+  color: #ffffff !important;
+}
+
+.theme-dark .message.sent strong {
+  color: #ffffff !important;
+}

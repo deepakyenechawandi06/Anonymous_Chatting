@@ -1,0 +1,196 @@
+/* Enhanced UI for chat interface */
+:root {
+  --primary-color: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-dark: #3730a3;
+  --accent-color: #10b981;
+  --text-light: #f9fafb;
+  --text-dark: #1f2937;
+  --bg-light: #ffffff;
+  --bg-dark: #111827;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --transition: all 0.3s ease;
+}
+
+/* Modern container styling */
+.container {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+/* Enhanced header */
+.header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  padding: 15px 20px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Profile photo styling */
+.profile-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-light);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.profile-photo:hover {
+  transform: scale(1.05);
+}
+
+/* Message styling */
+.message {
+  border-radius: var(--radius-md) !important;
+  padding: 12px 16px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  margin-bottom: 12px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.message:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+.message.sent {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
+  color: var(--text-light) !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.message.received {
+  background: linear-gradient(135deg, var(--bg-light), #f3f4f6) !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.message strong {
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* Chat area styling */
+.chat-area {
+  background-color: #f9fafb !important;
+  background-image: 
+    radial-gradient(circle at 25px 25px, rgba(0,0,0,0.01) 2%, transparent 0%), 
+    radial-gradient(circle at 75px 75px, rgba(0,0,0,0.01) 2%, transparent 0%);
+  background-size: 100px 100px;
+  padding: 15px !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+/* Input styling */
+.message-input input {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 12px 16px !important;
+  transition: var(--transition) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.message-input input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
+  outline: none !important;
+}
+
+/* Button styling */
+.button {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Member list styling */
+.member-list li {
+  border-radius: var(--radius-md) !important;
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6) !important;
+  margin-bottom: 8px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+}
+
+.member-list li:hover {
+  transform: translateX(3px);
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Animation for new messages */
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Toast notification styling */
+.toast {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Typing indicator styling */
+.typing-indicator {
+  color: var(--primary-color) !important;
+  font-style: italic;
+}
+
+/* Reply container styling */
+.reply-container {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(79, 70, 229, 0.05)) !important;
+  border-left: 3px solid var(--primary-color) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px 12px !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}

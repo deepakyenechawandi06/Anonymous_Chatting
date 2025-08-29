@@ -1,0 +1,32 @@
+/* Fix for message text visibility */
+.message p {
+  color: #1f2937 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.message.sent p {
+  color: white !important;
+}
+
+.message.received p {
+  color: #1f2937 !important;
+}
+
+/* Fix for dark theme */
+.theme-dark .message p {
+  color: #f3f4f6 !important;
+}
+
+/* Fix for message content */
+.message-container {
+  color: #1f2937;
+}
+
+/* Ensure text is visible in all themes */
+.theme-blue .message.received p,
+.theme-green .message.received p,
+.theme-purple .message.received p,
+.theme-sunset .message.received p {
+  color: #1f2937 !important;
+}

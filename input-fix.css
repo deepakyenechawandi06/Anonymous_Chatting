@@ -1,0 +1,43 @@
+/* Fix for input text visibility */
+#messageInput,
+.message-input input,
+input[type="text"],
+textarea {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  caret-color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Ensure text is visible while typing */
+#messageInput::placeholder,
+.message-input input::placeholder,
+input[type="text"]::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7 !important;
+}
+
+/* Fix for dark theme */
+.theme-dark #messageInput,
+.theme-dark .message-input input,
+.theme-dark input[type="text"],
+.theme-dark textarea {
+  color: #f3f4f6 !important;
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  caret-color: #f3f4f6 !important;
+}
+
+/* Fix for input focus */
+#messageInput:focus,
+.message-input input:focus,
+input[type="text"]:focus,
+textarea:focus {
+  border-color: #6d28d9 !important;
+  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2) !important;
+  outline: none !important;
+}

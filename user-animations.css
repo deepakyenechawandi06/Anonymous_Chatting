@@ -1,0 +1,118 @@
+/* Different animations for different users */
+
+/* Animation 1: Fade In */
+@keyframes fadeInAnimation {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation 2: Slide In */
+@keyframes slideInAnimation {
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Animation 3: Pop In */
+@keyframes popInAnimation {
+  0% { opacity: 0; transform: scale(0.5); }
+  70% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Animation 4: Rotate In */
+@keyframes rotateInAnimation {
+  from { opacity: 0; transform: rotateZ(-10deg) scale(0.8); }
+  to { opacity: 1; transform: rotateZ(0) scale(1); }
+}
+
+/* Animation 5: Bounce In */
+@keyframes bounceInAnimation {
+  0% { opacity: 0; transform: translateY(-50px); }
+  60% { transform: translateY(10px); }
+  80% { transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* User animation classes */
+.user-animation-1 p {
+  animation: fadeInAnimation 0.5s forwards;
+}
+
+.user-animation-2 p {
+  animation: slideInAnimation 0.5s forwards;
+}
+
+.user-animation-3 p {
+  animation: popInAnimation 0.5s forwards;
+}
+
+.user-animation-4 p {
+  animation: rotateInAnimation 0.5s forwards;
+}
+
+.user-animation-5 p {
+  animation: bounceInAnimation 0.7s forwards;
+}
+
+/* Character animations for each user */
+.user-animation-1 .char-animated {
+  display: inline-block;
+  opacity: 0;
+  animation: char1 0.5s forwards;
+  animation-delay: calc(0.03s * var(--char-index, 0));
+}
+
+.user-animation-2 .char-animated {
+  display: inline-block;
+  opacity: 0;
+  animation: char2 0.5s forwards;
+  animation-delay: calc(0.03s * var(--char-index, 0));
+}
+
+.user-animation-3 .char-animated {
+  display: inline-block;
+  opacity: 0;
+  animation: char3 0.5s forwards;
+  animation-delay: calc(0.03s * var(--char-index, 0));
+}
+
+.user-animation-4 .char-animated {
+  display: inline-block;
+  opacity: 0;
+  animation: char4 0.5s forwards;
+  animation-delay: calc(0.03s * var(--char-index, 0));
+}
+
+.user-animation-5 .char-animated {
+  display: inline-block;
+  opacity: 0;
+  animation: char5 0.5s forwards;
+  animation-delay: calc(0.03s * var(--char-index, 0));
+}
+
+@keyframes char1 {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes char2 {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes char3 {
+  0% { opacity: 0; transform: scale(0.5); }
+  70% { transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes char4 {
+  0% { opacity: 0; transform: rotateZ(45deg); }
+  100% { opacity: 1; transform: rotateZ(0); }
+}
+
+@keyframes char5 {
+  0% { opacity: 0; transform: translateY(-10px); }
+  60% { transform: translateY(3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

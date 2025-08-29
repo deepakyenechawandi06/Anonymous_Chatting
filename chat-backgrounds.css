@@ -1,0 +1,97 @@
+/* Chat background styles */
+.chat-area {
+  transition: background-color 0.3s ease, background-image 0.3s ease;
+  position: relative;
+}
+
+/* Default background */
+.chat-area.bg-default {
+  background-color: #f9fafb;
+}
+
+/* Light pattern background */
+.chat-area.bg-light-pattern {
+  background-color: #f9fafb;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e5e7eb' fill-opacity='0.6' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Dark pattern background */
+.chat-area.bg-dark-pattern {
+  background-color: #1f2937;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23374151' fill-opacity='0.6' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  color: #f3f4f6;
+}
+
+/* Gradient background */
+.chat-area.bg-gradient {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+}
+
+/* Solid light background */
+.chat-area.bg-solid-light {
+  background-color: #ffffff;
+}
+
+/* Solid dark background */
+.chat-area.bg-solid-dark {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+/* Image background */
+.chat-area.bg-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Semi-transparent overlay for better readability with image backgrounds */
+.chat-area.bg-image::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.chat-area.bg-image.dark-overlay::after {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Make sure messages appear above the overlay */
+.chat-area .message-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Adjust message colors for dark backgrounds */
+.chat-area.bg-dark-pattern .message,
+.chat-area.bg-solid-dark .message,
+.chat-area.bg-image.dark-overlay .message {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+.chat-area.bg-dark-pattern .message.sent,
+.chat-area.bg-solid-dark .message.sent,
+.chat-area.bg-image.dark-overlay .message.sent {
+  background-color: #4b5563;
+}
+
+/* Adjust typing indicator for dark backgrounds */
+.chat-area.bg-dark-pattern .typing-indicator,
+.chat-area.bg-solid-dark .typing-indicator,
+.chat-area.bg-image.dark-overlay .typing-indicator {
+  color: #d1d5db;
+}
+
+/* Adjust reply container for dark backgrounds */
+.chat-area.bg-dark-pattern .reply-container,
+.chat-area.bg-solid-dark .reply-container,
+.chat-area.bg-image.dark-overlay .reply-container {
+  background-color: rgba(255,255,255,0.1);
+}

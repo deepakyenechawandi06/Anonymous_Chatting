@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sound Test</title>
+</head>
+<body>
+  <h1>Sound Test</h1>
+  <p>Click the buttons below to test sounds:</p>
+  
+  <button id="sendBtn">Send Sound</button>
+  <button id="receiveBtn">Receive Sound</button>
+  
+  <audio id="sendSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
+  <audio id="receiveSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+  
+  <script>
+    document.getElementById('sendBtn').addEventListener('click', function() {
+      document.getElementById('sendSound').play();
+    });
+    
+    document.getElementById('receiveBtn').addEventListener('click', function() {
+      document.getElementById('receiveSound').play();
+    });
+  </script>
+</body>
+</html>

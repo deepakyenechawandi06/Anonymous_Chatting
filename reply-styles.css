@@ -1,0 +1,50 @@
+/* Reply styles for inline replies */
+.reply-container {
+  background-color: rgba(0,0,0,0.05);
+  border-left: 3px solid #4f46e5;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  position: relative;
+}
+
+.reply-close {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Context menu for messages */
+.message-context-menu {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 8px 0;
+  z-index: 100;
+}
+
+.message-context-menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.message-context-menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* Long press animation */
+@keyframes longPressAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.message.long-press {
+  animation: longPressAnimation 0.6s ease-in-out;
+}

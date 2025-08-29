@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direct WebSocket Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h1>Direct WebSocket Test</h1>
+  
+  <div>
+    <label for="serverAddress">Server Address:</label>
+    <input type="text" id="serverAddress" value="localhost:8080" placeholder="e.g., localhost:8080 or 192.168.1.100:8080">
+  </div>
+  
+  <button id="connectButton">Connect</button>
+  
+  <div id="status" class="status warning">
+    Enter server address and click Connect
+  </div>
+  
+  <div id="messageArea" style="display: none;">
+    <h3>Send Test Message</h3>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button id="sendButton">Send</button>
+    
+    <h3>Messages</h3>
+    <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto;"></div>
+  </div>
+  
+  <script>
+    let ws = null;
+    
+    document.getElementById('connectButton').addEventListener('click', connect);
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    
+    function connect() {
+      const serverAddress = document.getElementById('serverAddress').value;
+      const status = document.getElementById('status');
+      const messageArea = document.getElementById('messageArea');
+      
+      // Close existing connection if any
+      if (ws) {
+        ws.close();
+      }
+      
+      status.className = 'status warning';
+      status.textContent = `Connecting to ws://${serverAddress}...`;
+      
+      try {
+        ws = new WebSocket(`ws://${serverAddress}`);
+        
+        ws.onopen = () => {
+          status.className = 'status success';
+          status.textContent = `Connected to ${serverAddress}!`;
+          messageArea.style.display = 'block';
+          
+          // Send initial message
+          ws.send(JSON.stringify({
+            type: 'join',
+            groupId: 'test',
+            userId: 'tester',
+            isAdmin: true
+          }));
+        };
+        
+        ws.onmessage = (event) => {
+          const messages = document.getElementById('messages');
+          const message = document.createElement('div');
+          message.textContent = `Received: ${event.data}`;
+          message.style.borderBottom = '1px solid #eee';
+          message.style.padding = '5px 0';
+          messages.appendChild(message);
+          messages.scrollTop = messages.scrollHeight;
+        };
+        
+        ws.onerror = (error) => {
+          status.className = 'status error';
+          status.textContent = `Connection error! Server may not be running at ${serverAddress}.`;
+          messageArea.style.display = 'none';
+        };
+        
+        ws.onclose = () => {
+          status.className = 'status warning';
+          status.textContent = `Disconnected from ${serverAddress}.`;
+          messageArea.style.display = 'none';
+        };
+        
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = `Error: ${err.message}`;
+        messageArea.style.display = 'none';
+      }
+    }
+    
+    function sendMessage() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert('Not connected to server!');
+        return;
+      }
+      
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+      
+      if (message) {
+        ws.send(JSON.stringify({
+          type: 'message',
+          groupId: 'test',
+          userId: 'tester',
+          content: message
+        }));
+        
+        const messages = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `Sent: ${message}`;
+        messageElement.style.borderBottom = '1px solid #eee';
+        messageElement.style.padding = '5px 0';
+        messageElement.style.backgroundColor = '#e6f7ff';
+        messages.appendChild(messageElement);
+        messages.scrollTop = messages.scrollHeight;
+        
+        messageInput.value = '';
+      }
+    }
+    
+    // Allow pressing Enter to send message
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

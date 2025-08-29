@@ -1,0 +1,236 @@
+/* Animated Emoji Styles */
+
+/* Emoji Option Panel */
+.emoji-option-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  max-width: 90%;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  overflow: hidden;
+  display: none;
+}
+
+.emoji-option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.emoji-option-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.emoji-option-header button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.emoji-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.emoji-action-item:hover {
+  background-color: #f5f5f5;
+}
+
+.emoji-display {
+  font-size: 32px;
+  margin-bottom: 5px;
+  transition: transform 0.3s;
+}
+
+.emoji-action-name {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* Emoji Option Button */
+.emoji-option-btn {
+  background-color: #6d28d9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Emoji Action Message */
+.emoji-action-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+  padding: 5px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.emoji-action-sender {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.emoji-action-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emoji-action-display {
+  font-size: 48px;
+  margin-bottom: 5px;
+}
+
+.emoji-action-description {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Emoji Animations */
+.wave-animation .emoji-action-display {
+  animation: wave 1s infinite;
+  transform-origin: bottom right;
+}
+
+.thumbs-up-animation .emoji-action-display {
+  animation: thumbsUp 1s infinite;
+}
+
+.thumbs-down-animation .emoji-action-display {
+  animation: thumbsDown 1s infinite;
+}
+
+.clap-animation .emoji-action-display {
+  animation: clap 0.5s infinite;
+}
+
+.fire-animation .emoji-action-display {
+  animation: fire 0.7s infinite;
+}
+
+.heart-animation .emoji-action-display {
+  animation: heart 0.8s infinite;
+}
+
+.laugh-animation .emoji-action-display {
+  animation: laugh 0.6s infinite;
+}
+
+.party-animation .emoji-action-display {
+  animation: party 0.8s infinite;
+}
+
+/* Animation Keyframes */
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(20deg); }
+}
+
+@keyframes thumbsUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes thumbsDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes clap {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2) rotate(10deg); }
+}
+
+@keyframes fire {
+  0% { transform: scale(1) rotate(-5deg); }
+  25% { transform: scale(1.1) rotate(5deg); }
+  50% { transform: scale(1) rotate(-5deg); }
+  75% { transform: scale(1.1) rotate(5deg); }
+  100% { transform: scale(1) rotate(-5deg); }
+}
+
+@keyframes heart {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+@keyframes laugh {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-5deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-5px) rotate(5deg); }
+}
+
+@keyframes party {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(10deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-10px) rotate(-10deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Preview animations in the panel */
+.emoji-display.wave-animation:hover {
+  animation: wave 1s infinite;
+  transform-origin: bottom right;
+}
+
+.emoji-display.thumbs-up-animation:hover {
+  animation: thumbsUp 1s infinite;
+}
+
+.emoji-display.thumbs-down-animation:hover {
+  animation: thumbsDown 1s infinite;
+}
+
+.emoji-display.clap-animation:hover {
+  animation: clap 0.5s infinite;
+}
+
+.emoji-display.fire-animation:hover {
+  animation: fire 0.7s infinite;
+}
+
+.emoji-display.heart-animation:hover {
+  animation: heart 0.8s infinite;
+}
+
+.emoji-display.laugh-animation:hover {
+  animation: laugh 0.6s infinite;
+}
+
+.emoji-display.party-animation:hover {
+  animation: party 0.8s infinite;
+}

@@ -1,0 +1,2531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Incognito Chatting</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      box-sizing: border-box;
+      transition: background 0.3s ease;
+    }
+    
+    /* Theme styles */
+    body.theme-blue {
+      background: linear-gradient(135deg, #3b82f6, #1e40af);
+    }
+    
+    body.theme-green {
+      background: linear-gradient(135deg, #10b981, #065f46);
+    }
+    
+    body.theme-purple {
+      background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+    }
+    
+    body.theme-dark {
+      background: linear-gradient(135deg, #1f2937, #111827);
+    }
+    
+    body.theme-sunset {
+      background: linear-gradient(135deg, #f97316, #c2410c);
+    }
+    
+    @media (min-width: 992px) {
+      body {
+        padding: 20px;
+      }
+    }
+    
+    /* Dropdown styles */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 10;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    @media (max-width: 768px) {
+      .dropdown-content {
+        right: 0;
+        left: auto;
+        width: 200px;
+      }
+    }
+    
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    
+    .dropdown-content a:hover {
+      background-color: #cec4c4;
+    }
+    
+    /* Share app icons */
+    .dropdown-content a[id^="share"] {
+      display: flex;
+      align-items: center;
+    }
+    
+    .dropdown-content a[id^="share"]::before {
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    
+    #shareWhatsApp::before {
+      content: "📱";
+    }
+    
+    #shareTelegram::before {
+      content: "✈️";
+    }
+    
+    #shareFacebook::before {
+      content: "👍";
+    }
+    
+    #shareTwitter::before {
+      content: "🐦";
+    }
+    
+    #shareEmail::before {
+      content: "✉️";
+    }
+    
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    
+    /* File upload drop zone */
+    .drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+    
+    .drop-zone.active {
+      border-color: #4f46e5;
+      background-color: rgba(79, 70, 229, 0.1);
+    }
+    
+    /* Enhanced message styling */
+    .message {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      position: relative;
+      max-width: 80%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.sent {
+      background-color: #8bc161;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.received {
+      background-color: #963838;
+      margin-right: auto;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.85em;
+    }
+    
+    .timestamp {
+      font-size: 0.7em;
+      color: #999;
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+    }
+    
+    /* Chat image styling */
+    .chat-image {
+      border-radius: 8px;
+      margin-top: 5px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .chat-image:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Member list styling */
+    .member-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    @media (min-width: 992px) {
+      .member-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        max-height: 300px;
+      }
+    }
+    
+    .member-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 5px;
+      background-color: #c71b1b;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+      flex-wrap: wrap;
+    }
+    
+    @media (max-width: 480px) {
+      .member-list li {
+        padding: 6px 8px;
+      }
+      
+      .member-controls {
+        margin-top: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+    
+    .member-list li:hover {
+      background-color: #0af2cb;
+    }
+    
+    .member-controls {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .kick-btn, .mute-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 2px 5px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    
+    .kick-btn:hover {
+      background-color: #ad6464;
+    }
+    
+    .mute-btn:hover {
+      background-color: #f45d06;
+    }
+    
+    .muted-badge {
+      background-color: #ff6b6b;
+      color: rgb(104, 70, 70);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.7em;
+      margin-left: 5px;
+    }
+    
+    .admin-badge {
+      color: #ffc107;
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    
+    .self-badge {
+      color: #666;
+      font-style: italic;
+      margin-left: 5px;
+    }
+    
+    .admin-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #ffc107;
+      transition: background-color 0.2s;
+    }
+    
+    .admin-btn:hover {
+      background-color: #443505;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background-color: rgb(26, 13, 13);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+      height: 100%;
+      max-height: 700px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Prevent horizontal scrolling */
+    body, html {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    
+    /* Responsive styles */
+    @media (min-width: 1200px) {
+      .container {
+        max-width: 900px;
+        max-height: 750px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+      
+      body {
+        padding: 0;
+      }
+    }
+    .header {
+      background-color: #4f46e5;
+      color: rgb(36, 21, 21);
+      padding: 15px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease;
+    }
+    
+    /* Theme-specific header styles */
+    .theme-blue .header {
+      background-color: #2563eb;
+    }
+    
+    .theme-green .header {
+      background-color: #059669;
+    }
+    
+    .theme-purple .header {
+      background-color: #7c3aed;
+    }
+    
+    .theme-dark .header {
+      background-color: #1f2937;
+    }
+    
+    .theme-sunset .header {
+      background-color: #ea580c;
+    }
+    .content {
+      padding: 15px;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    @media (min-width: 992px) {
+      .content {
+        padding: 20px 25px;
+      }
+      
+      .header {
+        padding: 15px 25px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px;
+      }
+      .content {
+        padding: 10px;
+      }
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    
+    @media (min-width: 992px) {
+      h1 {
+        font-size: 28px;
+      }
+    }
+    .error-message {
+      background-color: #261212;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .success-message {
+      background-color: #294f36;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .button {
+      background-color: #4f46e5;
+      color: rgb(76, 49, 49);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Theme-specific button styles */
+    .theme-blue .button {
+      background-color: #2563eb;
+    }
+    
+    .theme-green .button {
+      background-color: #059669;
+    }
+    
+    .theme-purple .button {
+      background-color: #7c3aed;
+    }
+    
+    .theme-dark .button {
+      background-color: #4b5563;
+    }
+    
+    .theme-sunset .button {
+      background-color: #ea580c;
+    }
+    
+    @media (max-width: 768px) {
+      .button {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .button {
+        padding: 8px 12px;
+      }
+    }
+    .button:hover {
+      background-color: #4338ca;
+    }
+    .button:disabled {
+      background-color: #a5b4fc;
+      cursor: not-allowed;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #151c27;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border: 1px solid #303d58;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background-color: #5e768e;
+      min-height: 300px;
+      max-height: 400px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    
+    /* Theme-specific chat area styles */
+    .theme-blue .chat-area {
+      background-color: #578bad;
+      border-color: #bae6fd;
+    }
+    
+    .theme-green .chat-area {
+      background-color: #2b7f57;
+      border-color: #a7f3d0;
+    }
+    
+    .theme-purple .chat-area {
+      background-color: #7a69d0;
+      border-color: #e3e1ea;
+    }
+    
+    .theme-dark .chat-area {
+      background-color: #1f2937;
+      border-color: #374151;
+      color: #6c90da;
+    }
+    
+    .theme-sunset .chat-area {
+      background-color: #e3b175;
+      border-color: #fed7aa;
+    }
+    
+    @media (min-width: 1200px) {
+      .chat-area {
+        min-height: 400px;
+        max-height: 450px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .chat-area {
+        max-height: calc(100vh - 250px);
+        margin-bottom: 8px;
+        padding: 8px;
+      }
+    }
+    .message {
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 18px;
+      max-width: 80%;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      touch-action: pan-y;
+      user-select: none;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    
+    .message.swiping {
+      transform: translateX(40px);
+    }
+    
+    .reply-button {
+      position: absolute;
+      left: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      background: #4f46e5;
+      color: rgb(228, 149, 149);
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .message.swiping .reply-button {
+      opacity: 1;
+    }
+    
+    .reply-container {
+      background-color: rgba(0,0,0,0.05);
+      border-left: 3px solid #4f46e5;
+      padding: 4px 8px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      position: relative;
+    }
+    
+    .reply-close {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    
+    @media (min-width: 992px) {
+      .message {
+        max-width: 70%;
+        padding: 10px 15px;
+        margin-bottom: 12px;
+      }
+    }
+    .message.received {
+      background-color: #3b465b;
+      align-self: flex-start;
+    }
+    .message.sent {
+      background-color: #788495;
+      margin-left: auto;
+      text-align: right;
+    }
+    
+    /* Theme-specific message styles */
+    .theme-blue .message.sent {
+      background-color: #0773f7;
+    }
+    .theme-blue .message.received {
+      background-color: #5684a2;
+    }
+    
+    .theme-green .message.sent {
+      background-color: #a7f3d0;
+    }
+    .theme-green .message.received {
+      background-color: #68f1aa;
+    }
+    
+    .theme-purple .message.sent {
+      background-color: #242036;
+    }
+    .theme-purple .message.received {
+      background-color: #3105f7;
+    }
+    
+    .theme-dark .message.sent {
+      background-color: #374151;
+      color: #542e59;
+    }
+    .theme-dark .message.received {
+      background-color: #4b5563;
+      color: #e62d52;
+    }
+    
+    .theme-sunset .message.sent {
+      background-color: #fed7aa;
+    }
+    .theme-sunset .message.received {
+      background-color: #de902b;
+    }
+    .message-container {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .typing-indicator {
+      padding: 5px 10px;
+      font-size: 0.9em;
+      color: #666;
+      animation: pulse 0.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+    .message-input {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+    .message-input input {
+      flex: 1;
+      margin-bottom: 0;
+      min-width: 0;
+    }
+    .message-input button {
+      width: auto;
+      margin-bottom: 0;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
+    @media (min-width: 992px) {
+      .message-input {
+        gap: 12px;
+      }
+      .message-input button {
+        padding: 10px 16px;
+        font-size: 16px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .message-input {
+        gap: 5px;
+      }
+      .message-input button {
+        padding: 8px;
+        font-size: 12px;
+      }
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4f46e5;
+      color: rgb(81, 43, 43);
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
+      word-break: break-word;
+    }
+    
+    @media (max-width: 768px) {
+      .toast {
+        width: 80%;
+        padding: 10px 16px;
+      }
+    }
+    .toast.show {
+      opacity: 1;
+    }
+    .kick-btn {
+      background-color: #ef4444;
+      color: rgb(31, 198, 89);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .kick-btn:hover {
+      background-color: #dc2626;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #76996a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <!-- Content will be dynamically inserted here -->
+  </div>
+  
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // Main application
+    const app = {
+      userId: localStorage.getItem('userId') || generateUUID(),
+      groupId: '',
+      groupName: 'Incognito Chatting',
+      groupAvatar: '',
+      messages: [],
+      ws: null,
+      isAdmin: false,
+      members: [],
+      connectionError: false,
+      currentPage: 'landing',
+      joinedViaQR: false,
+      theme: localStorage.getItem('chatTheme') || 'default',
+      replyingTo: null,
+      
+      // Initialize the application
+      init() {
+        localStorage.setItem('userId', this.userId);
+        this.typingUsers = {};
+        this.applyTheme(this.theme);
+        
+        // Set default group avatar color
+        this.groupAvatarColor = '#4f46e5';
+        
+        // Initialize reply functionality
+        this.replyingTo = null;
+        
+        // Initialize drafts storage
+        this.drafts = {};
+        
+        this.connectToServer();
+        
+        // Check URL parameters for group ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupParam = urlParams.get('group');
+        if (groupParam) {
+          this.groupId = groupParam;
+          // Set a flag to indicate joining via QR code
+          this.joinedViaQR = true;
+          this.currentPage = 'chat'; // Immediately show chat UI
+          
+          // Wait for WebSocket connection before joining
+          const checkConnection = setInterval(() => {
+            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+              clearInterval(checkConnection);
+              // Auto-join the group when coming from QR code scan
+              this.joinGroup(groupParam);
+            }
+          }, 100);
+        }
+        
+        this.render();
+        
+        // Handle file drag and drop for image upload
+        window.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        
+        window.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          if (this.currentPage === 'chat' && e.dataTransfer.files.length > 0) {
+            const file = e.dataTransfer.files[0];
+            if (file.type.startsWith('image/')) {
+              this.uploadImage(file);
+            } else {
+              this.showToast('Only image files are supported');
+            }
+          }
+        });
+        
+        // Handle paste events for image upload
+        document.addEventListener('paste', (e) => {
+          if (this.currentPage === 'chat' && !this.connectionError && e.clipboardData && e.clipboardData.items) {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+              if (items[i].type.indexOf('image') !== -1) {
+                const file = items[i].getAsFile();
+                if (file) {
+                  this.uploadImage(file);
+                  break;
+                }
+              }
+            }
+          } else if (this.currentPage === 'chat' && this.connectionError && e.clipboardData) {
+            // Check if paste contains image
+            const hasImage = Array.from(e.clipboardData.items).some(item => item.type.indexOf('image') !== -1);
+            if (hasImage) {
+              this.showToast('Cannot upload images while offline');
+            }
+          }
+        });
+        
+        // Handle offline/online events
+        window.addEventListener('online', () => {
+          if (this.connectionError) {
+            this.showToast('Connection restored. Reconnecting...');
+            this.connectToServer();
+          }
+        });
+        
+        window.addEventListener('offline', () => {
+          this.connectionError = true;
+          this.showToast('Network connection lost');
+          this.render();
+        });
+      },
+      
+      // Connect to WebSocket server
+      connectToServer() {
+        try {
+          // Get the hostname from the current URL
+          const hostname = window.location.hostname || 'localhost';
+          const wsUrl = `ws://${hostname}:8080`;
+          console.log('Connecting to WebSocket server at:', wsUrl);
+          
+          // Display connection info for debugging
+          if (hostname === 'localhost') {
+            console.log('Using localhost as hostname. Make sure the server is running on this computer.');
+          }
+          
+          // Initialize with user color and nickname
+          this.userColor = this.getRandomColor();
+          this.userNickname = `User ${this.userId.substring(0, 6)}`;
+          
+          this.ws = new WebSocket(wsUrl);
+          
+          // Set a connection timeout
+          const connectionTimeout = setTimeout(() => {
+            if (this.ws.readyState !== WebSocket.OPEN) {
+              console.error('WebSocket connection timeout');
+              this.connectionError = true;
+              this.render();
+            }
+          }, 5000);
+          
+          this.ws.onopen = () => {
+            clearTimeout(connectionTimeout);
+            console.log('Connected to server');
+            this.connectionError = false;
+            this.render();
+          };
+          
+          this.ws.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              if (data.type === 'message') {
+                // Process incoming messages for sensitive information
+                if (data.content) {
+                  data.content = this.detectSensitiveInfo(data.content);
+                }
+                
+                // Ensure message has an ID
+                if (!data.id) {
+                  data.id = generateUUID();
+                }
+                
+                this.messages.push(data);
+                
+                // Clear typing indicator for the user who sent the message
+                if (this.typingUsers[data.userId]) {
+                  delete this.typingUsers[data.userId];
+                  this.updateTypingIndicator();
+                }
+              } else if (data.type === 'typing') {
+                // Handle typing indicator
+                if (data.isTyping) {
+                  this.typingUsers[data.userId] = {
+                    nickname: data.nickname || `User ${data.userId.substring(0, 6)}`,
+                    timestamp: Date.now()
+                  };
+                } else {
+                  delete this.typingUsers[data.userId];
+                }
+                this.updateTypingIndicator();
+              } else if (data.type === 'theme') {
+                // Handle theme change from admin
+                if (data.theme) {
+                  this.theme = data.theme;
+                  localStorage.setItem('chatTheme', data.theme);
+                  this.applyTheme(data.theme);
+                  this.showToast(`Chat theme changed to ${data.theme}`);
+                }
+              } else if (data.type === 'background') {
+                // Handle background change from admin
+                console.log('Received background change:', data.bgType);
+                
+                if (data.bgType === 'custom' && data.customValue) {
+                  localStorage.setItem('chatBackground', 'custom');
+                  localStorage.setItem('chatBackgroundColor', data.customValue);
+                  
+                  // Use the global changeBackground function
+                  if (window.changeBackground) {
+                    window.changeBackground('custom', data.customValue);
+                  } else {
+                    // Fallback if global function not available
+                    const chatArea = document.querySelector('.chat-area');
+                    if (chatArea) {
+                      chatArea.style.backgroundColor = data.customValue;
+                    }
+                  }
+                  
+                  this.showToast('Chat background changed by admin');
+                } else if (data.bgType === 'image' && data.customValue) {
+                  console.log('Applying image background:', data.customValue.substring(0, 50) + '...');
+                  
+                  localStorage.setItem('chatBackground', 'image');
+                  localStorage.setItem('chatBackgroundImage', data.customValue);
+                  localStorage.setItem('chatBackgroundOverlay', data.darkOverlay ? 'dark' : 'light');
+                  
+                  // For server-hosted images, make sure we have the full URL
+                  let imageUrl = data.customValue;
+                  if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('data:')) {
+                    imageUrl = '/' + imageUrl;
+                    console.log('Adjusted image URL:', imageUrl);
+                  }
+                  
+                  // Use the global changeBackground function
+                  if (window.changeBackground) {
+                    window.changeBackground('image', imageUrl, data.darkOverlay);
+                  } else {
+                    // Fallback if global function not available
+                    const chatArea = document.querySelector('.chat-area');
+                    if (chatArea) {
+                      // Remove all existing background classes
+                      chatArea.classList.remove(
+                        'bg-default', 
+                        'bg-light-pattern', 
+                        'bg-dark-pattern', 
+                        'bg-gradient', 
+                        'bg-solid-light', 
+                        'bg-solid-dark',
+                        'bg-image',
+                        'dark-overlay'
+                      );
+                      
+                      // Reset custom styles
+                      chatArea.style.backgroundColor = '';
+                      chatArea.style.backgroundImage = '';
+                      
+                      // Apply new background
+                      chatArea.classList.add('bg-image');
+                      if (data.darkOverlay) {
+                        chatArea.classList.add('dark-overlay');
+                      }
+                      chatArea.style.backgroundImage = `url(${imageUrl})`;
+                      
+                      // Force a reflow
+                      void chatArea.offsetWidth;
+                    }
+                  }
+                  
+                  this.showToast('Chat background changed by admin');
+                  
+                  // Create a test image to verify loading
+                  const testImg = new Image();
+                  testImg.onload = () => console.log('Background image loaded successfully');
+                  testImg.onerror = () => console.error('Failed to load background image');
+                  testImg.src = imageUrl;
+                } else {
+                  localStorage.setItem('chatBackground', data.bgType);
+                  localStorage.removeItem('chatBackgroundColor');
+                  localStorage.removeItem('chatBackgroundImage');
+                  
+                  // Use the global changeBackground function
+                  if (window.changeBackground) {
+                    window.changeBackground(data.bgType);
+                  } else {
+                    // Fallback if global function not available
+                    const chatArea = document.querySelector('.chat-area');
+                    if (chatArea) {
+                      chatArea.className = chatArea.className.replace(/bg-[a-z-]+/g, '');
+                      chatArea.classList.add(`bg-${data.bgType}`);
+                    }
+                  }
+                  
+                  this.showToast('Chat background changed by admin');
+                }
+                
+                // Force a reflow to ensure the background is applied
+                const chatArea = document.querySelector('.chat-area');
+                if (chatArea) {
+                  void chatArea.offsetWidth;
+                }
+              } else if (data.type === 'groupName') {
+                // Handle group name change from admin
+                if (data.name) {
+                  this.groupName = data.name;
+                  this.groupAvatar = data.avatar;
+                  this.showToast(`Group name changed to "${data.name}"`);
+                  this.render();
+                }
+              } else if (data.type === 'members') {
+                this.members = data.members;
+                // Check if user is admin after member list update
+                const currentUser = this.members.find(m => m.id === this.userId);
+                if (currentUser && currentUser.isAdmin) {
+                  this.isAdmin = true;
+                  // Generate QR code when admin status is confirmed (if not joined via QR)
+                  if (!this.joinedViaQR) {
+                    setTimeout(() => this.generateQRCode(), 100);
+                  }
+                }
+              } else if (data.type === 'admin') {
+                this.isAdmin = data.isAdmin;
+                // Generate QR code when becoming admin (if not joined via QR)
+                if (this.isAdmin && !this.joinedViaQR) {
+                  setTimeout(() => this.generateQRCode(), 100);
+                }
+                // Show notification when becoming admin
+                if (this.isAdmin) {
+                  this.showToast('You are now an admin');
+                }
+              } else if (data.type === 'image') {
+                this.messages.push(data);
+              } else if (data.type === 'kicked') {
+                alert(data.message);
+                this.currentPage = 'landing';
+                this.joinedViaQR = false; // Reset QR flag when kicked
+              } else if (data.type === 'muted' || data.type === 'unmuted') {
+                this.showToast(data.message);
+              } else if (data.type === 'adminChanged') {
+                this.showToast(data.message);
+              }
+              this.render();
+              
+              // Scroll to bottom of chat when new messages arrive
+              if (data.type === 'message' || data.type === 'image') {
+                const chatArea = document.getElementById('chatMessages');
+                if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+              }
+            } catch (err) {
+              console.error('Error parsing message:', err);
+            }
+          };
+          
+          this.ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            this.connectionError = true;
+            this.render();
+            
+            // Show detailed error
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+              <strong>WebSocket Error</strong>
+              <p>Could not connect to the server. Please check that:</p>
+              <ol>
+                <li>The server is running (npm start)</li>
+                <li>Port 8080 is not blocked by a firewall</li>
+                <li>No other application is using port 8080</li>
+              </ol>
+            `;
+            document.body.prepend(errorDiv);
+          };
+          
+          this.ws.onclose = () => {
+            console.log('WebSocket connection closed');
+            this.connectionError = true;
+            this.render();
+          };
+        } catch (err) {
+          this.connectionError = true;
+          this.render();
+        }
+      },
+      
+      // Create a new chat group
+      createGroup() {
+        const newGroupId = generateUUID();
+        this.groupId = newGroupId;
+        this.isAdmin = true;
+        
+        // Set default group name
+        const defaultName = "Incognito Chatting";
+        this.groupName = defaultName;
+        this.generateGroupAvatar(defaultName);
+        
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'join',
+            groupId: newGroupId,
+            userId: this.userId,
+            isAdmin: true,
+            color: this.userColor,
+            nickname: this.userNickname,
+            joinedViaQR: false,
+            groupName: this.groupName,
+            groupAvatar: this.groupAvatar
+          }));
+          this.currentPage = 'chat';
+          this.render();
+          
+          // Generate QR code after rendering
+          setTimeout(() => this.generateQRCode(), 100);
+          
+          // Show admin notification
+          this.showToast('Group created. You are the admin.');
+        } else {
+          alert('Cannot connect to server. Please make sure the server is running.');
+        }
+      },
+      
+      // Join an existing chat group
+      joinGroup(id) {
+        if (!id.trim()) {
+          alert('Please enter a valid Group ID');
+          return;
+        }
+        
+        this.groupId = id;
+        
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'join',
+            groupId: id,
+            userId: this.userId,
+            isAdmin: false,
+            color: this.userColor,
+            nickname: this.userNickname,
+            joinedViaQR: this.joinedViaQR // Send info about how user joined
+          }));
+          this.currentPage = 'chat';
+          this.render();
+          
+          // Show toast notification when joining from QR code
+          if (this.joinedViaQR) {
+            this.showToast('Joined chat group via QR code');
+          }
+          
+          // Request background settings from admin when joining
+          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({
+              type: 'requestBackground',
+              groupId: id,
+              userId: this.userId
+            }));
+          }
+        } else {
+          alert('Cannot connect to server. Please make sure the server is running.');
+        }
+        
+        return id;
+      },
+      
+      // Process links and phone numbers in messages
+      detectSensitiveInfo(text) {
+        if (!text) return '';
+        
+        // Phone number pattern (various formats)
+        const phonePattern = /(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g;
+        
+        // URL/link pattern
+        const urlPattern = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,})/g;
+        
+        // Replace phone numbers with asterisks
+        let processed = text.replace(phonePattern, '***-***-****');
+        
+        // Make URLs clickable instead of removing them
+        processed = processed.replace(urlPattern, (match) => {
+          let url = match;
+          if (!url.startsWith('http')) {
+            url = 'https://' + url;
+          }
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${match}</a>`;
+        });
+        
+        return processed;
+      },
+      
+      // Track typing status
+      typingUsers: {},
+      typingTimeout: null,
+      
+      // Send typing indicator
+      sendTypingStatus(isTyping) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'typing',
+            groupId: this.groupId,
+            userId: this.userId,
+            isTyping: isTyping,
+            nickname: this.userNickname
+          }));
+        }
+      },
+      
+      // Set reply to message
+      setReplyTo(messageId) {
+        const message = this.messages.find(m => m.id === messageId);
+        if (!message) return;
+        
+        this.replyingTo = message;
+        this.renderReplyUI();
+        
+        // Focus on input after setting reply
+        document.getElementById('messageInput').focus();
+        
+        // Trigger custom event for reply screen
+        const event = new CustomEvent('messageReplySet', { detail: { messageId } });
+        document.dispatchEvent(event);
+      },
+      
+      // Clear reply
+      clearReply() {
+        this.replyingTo = null;
+        this.renderReplyUI();
+      },
+      
+      // Render reply UI
+      renderReplyUI() {
+        const replyContainer = document.getElementById('replyContainer');
+        if (!replyContainer) return;
+        
+        if (this.replyingTo) {
+          const sender = this.replyingTo.nickname || `User ${this.replyingTo.userId.substring(0, 6)}`;
+          const content = this.replyingTo.type === 'image' ? '[Image]' : this.replyingTo.content.substring(0, 50) + (this.replyingTo.content.length > 50 ? '...' : '');
+          
+          replyContainer.innerHTML = `
+            <div class="reply-container">
+              <strong>${sender}:</strong> ${content}
+              <span class="reply-close" id="clearReplyBtn">✕</span>
+            </div>
+          `;
+          replyContainer.style.display = 'block';
+          
+          document.getElementById('clearReplyBtn').addEventListener('click', () => this.clearReply());
+        } else {
+          replyContainer.innerHTML = '';
+          replyContainer.style.display = 'none';
+        }
+      },
+      
+      // Send a message
+      sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        
+        // Check if the current user is muted
+        const currentUser = this.members.find(m => m.id === this.userId);
+        if (currentUser && currentUser.muted) {
+          this.showToast('You are muted and cannot send messages');
+          return;
+        }
+        
+        if (message && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          // Process message to encrypt/remove sensitive information
+          const processedMessage = this.detectSensitiveInfo(message);
+          
+          const messageData = {
+            type: 'message',
+            groupId: this.groupId,
+            userId: this.userId,
+            content: processedMessage,
+            nickname: this.userNickname,
+            color: this.userColor,
+            id: generateUUID() // Add unique ID to each message
+          };
+          
+          // Add reply information if replying to a message
+          if (this.replyingTo) {
+            messageData.replyTo = {
+              id: this.replyingTo.id,
+              content: this.replyingTo.content,
+              nickname: this.replyingTo.nickname,
+              userId: this.replyingTo.userId,
+              type: this.replyingTo.type
+            };
+            
+            // Clear reply after sending
+            this.clearReply();
+          }
+          
+          this.ws.send(JSON.stringify(messageData));
+          messageInput.value = '';
+          
+          // Hide clear draft button
+          const clearDraftBtn = document.getElementById('clearDraftBtn');
+          if (clearDraftBtn) {
+            clearDraftBtn.style.display = 'none';
+          }
+          
+          // Send stopped typing status
+          this.sendTypingStatus(false);
+        }
+      },
+      
+      // Upload and send an image
+      uploadImage(file) {
+        if (!file || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+        
+        // Check if the current user is muted
+        const currentUser = this.members.find(m => m.id === this.userId);
+        if (currentUser && currentUser.muted) {
+          this.showToast('You are muted and cannot send images');
+          return;
+        }
+        
+        // Check file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          this.showToast('Image too large (max 5MB)');
+          return;
+        }
+        
+        // Check file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+          this.showToast('Invalid file type. Please use JPG, PNG, GIF or WEBP');
+          return;
+        }
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        // Show loading indicator
+        this.showToast('Uploading image...');
+        
+        fetch('/upload', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Upload failed: ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Send image message via WebSocket
+          this.ws.send(JSON.stringify({
+            type: 'image',
+            groupId: this.groupId,
+            userId: this.userId,
+            nickname: this.userNickname,
+            color: this.userColor,
+            imageUrl: data.url
+          }));
+          this.showToast('Image sent!');
+        })
+        .catch(error => {
+          console.error('Error uploading image:', error);
+          this.showToast('Failed to upload image: ' + error.message);
+          
+          // Retry with different content type if there was an error
+          if (error.message.includes('failed')) {
+            this.retryImageUpload(file);
+          }
+        });
+      },
+      
+      // Retry image upload with different approach
+      retryImageUpload(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        this.showToast('Retrying upload...');
+        
+        fetch('/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.url) {
+            this.ws.send(JSON.stringify({
+              type: 'image',
+              groupId: this.groupId,
+              userId: this.userId,
+              nickname: this.userNickname,
+              color: this.userColor,
+              imageUrl: data.url
+            }));
+            this.showToast('Image sent!');
+          } else {
+            throw new Error('Upload failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error on retry:', error);
+          this.showToast('Could not upload image');
+        });
+      },
+      
+      // Kick a member (admin only)
+      kickMember(memberId) {
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'kick',
+            groupId: this.groupId,
+            targetId: memberId
+          }));
+        }
+      },
+      
+      // Mute a member (admin only)
+      muteMember(memberId) {
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'mute',
+            groupId: this.groupId,
+            targetId: memberId
+          }));
+        }
+      },
+      
+      // Unmute a member (admin only)
+      unmuteMember(memberId) {
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'unmute',
+            groupId: this.groupId,
+            targetId: memberId
+          }));
+        }
+      },
+      
+      // Make a user admin (admin only)
+      makeAdmin(memberId) {
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'makeAdmin',
+            groupId: this.groupId,
+            targetId: memberId
+          }));
+        }
+      },
+      
+      // Change nickname
+      changeNickname(nickname) {
+        if (nickname && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'nickname',
+            groupId: this.groupId,
+            userId: this.userId,
+            nickname: nickname
+          }));
+        }
+      },
+      
+      // Generate QR code for the group
+      generateQRCode() {
+        // Allow any user to generate QR code when requested
+        
+        // Get the current IP address or hostname
+        const hostname = window.location.hostname || 'localhost';
+        const port = window.location.port || '80';
+        const protocol = window.location.protocol || 'http:';
+        
+        // Create a shareable URL that includes the IP address instead of localhost
+        const url = `${protocol}//${hostname}:${port}${window.location.pathname}?group=${this.groupId}`;
+        
+        // Generate QR code
+        const qrContainer = document.getElementById('qrcode');
+        if (qrContainer) {
+          qrContainer.innerHTML = '';
+          QRCode.toCanvas(qrContainer, url, { width: 200 }, (error) => {
+            if (error) {
+              console.error('Error generating QR code:', error);
+              this.showToast('Could not generate QR code');
+            }
+          });
+        }
+      },
+      
+      // Share the group link
+      shareLink() {
+        // Get the current IP address or hostname
+        const hostname = window.location.hostname || 'localhost';
+        const port = window.location.port || '80';
+        const protocol = window.location.protocol || 'http:';
+        
+        // Create a shareable URL that includes the IP address instead of localhost
+        const url = `${protocol}//${hostname}:${port}${window.location.pathname}?group=${this.groupId}`;
+        
+        // Create a temporary input to copy the URL
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        
+        try {
+          // Copy to clipboard
+          const successful = document.execCommand('copy');
+          if (successful) {
+            this.showToast('Link copied to clipboard!');
+          } else {
+            this.showToast('Could not copy link');
+          }
+        } catch (err) {
+          console.error('Copy failed:', err);
+          this.showToast('Could not copy link');
+        }
+        
+        document.body.removeChild(tempInput);
+        
+        // Try native sharing if available (mobile devices)
+        try {
+          if (navigator.share) {
+            navigator.share({
+              title: 'Incognito Chatting',
+              text: 'Join my anonymous chat group!',
+              url: url
+            }).catch(err => console.log('Share failed:', err));
+          }
+        } catch (err) {
+          console.log('Share API not supported');
+        }
+      },
+      
+      // Share to specific apps
+      shareToApp(app) {
+        const hostname = window.location.hostname || 'localhost';
+        const port = window.location.port || '80';
+        const protocol = window.location.protocol || 'http:';
+        const url = `${protocol}//${hostname}:${port}${window.location.pathname}?group=${this.groupId}`;
+        const text = 'Join my incognito chatting group!';
+        
+        switch(app) {
+          case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+            break;
+          case 'telegram':
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+            break;
+          case 'facebook':
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            break;
+          case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            break;
+          case 'email':
+            window.location.href = `mailto:?subject=Join my Incognito Chatting&body=${encodeURIComponent(text + ' ' + url)}`;
+            break;
+        }
+        
+        this.showToast(`Sharing to ${app}...`);
+        document.querySelector('.dropdown-content').style.display = 'none';
+      },
+      
+      // Update typing indicator
+      updateTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (!typingIndicator) return;
+        
+        // Get list of currently typing users (excluding self)
+        const typingUsersList = Object.entries(this.typingUsers)
+          .filter(([userId]) => userId !== this.userId)
+          .map(([_, data]) => data.nickname);
+        
+        // Update the typing indicator text
+        if (typingUsersList.length === 0) {
+          typingIndicator.textContent = '';
+        } else if (typingUsersList.length === 1) {
+          typingIndicator.textContent = `${typingUsersList[0]} is typing...`;
+        } else if (typingUsersList.length === 2) {
+          typingIndicator.textContent = `${typingUsersList[0]} and ${typingUsersList[1]} are typing...`;
+        } else {
+          typingIndicator.textContent = `${typingUsersList.length} people are typing...`;
+        }
+      },
+      
+      // Show toast notification
+      showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      },
+      
+      // Handle file input change for image upload
+      handleFileInput(files) {
+        if (files && files.length > 0) {
+          const file = files[0];
+          this.uploadImage(file);
+        }
+      },
+      
+      // Get random color for user
+      getRandomColor() {
+        const colors = [
+          '#FF5733', '#33FF57', '#3357FF', '#FF33A8', '#33A8FF',
+          '#A833FF', '#FF8C33', '#33FFC5', '#FF33C5', '#C533FF'
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+      },
+      
+      // Filter abusive words
+      filterAbusiveWords(text) {
+        if (!text) return '';
+        const abusiveWords = ['fuck', 'shit', 'ass', 'bitch', 'damn', 'cunt', 'dick'];
+        let filtered = text;
+        abusiveWords.forEach(word => {
+          const regex = new RegExp(word, 'gi');
+          filtered = filtered.replace(regex, '*'.repeat(word.length));
+        });
+        return filtered;
+      },
+      
+      // Change nickname
+      changeNickname() {
+        const newNickname = prompt('Enter your new nickname:');
+        if (newNickname && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'nickname',
+            groupId: this.groupId,
+            userId: this.userId,
+            nickname: newNickname
+          }));
+        }
+      },
+      
+      // Change group name
+      changeGroupName() {
+        if (!this.isAdmin) return;
+        
+        const newName = prompt('Enter a new group name:', this.groupName);
+        if (newName && newName.trim() && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.groupName = newName.trim();
+          
+          // Generate avatar based on group name
+          this.generateGroupAvatar(newName);
+          
+          // Broadcast group name change
+          this.ws.send(JSON.stringify({
+            type: 'groupName',
+            groupId: this.groupId,
+            name: newName.trim(),
+            avatar: this.groupAvatar,
+            color: this.groupAvatarColor
+          }));
+          
+          // Update UI
+          this.render();
+          
+          // Show toast notification
+          this.showToast('Group name changed to "' + newName.trim() + '"');
+        }
+      },
+      
+      // Generate avatar based on group name
+      generateGroupAvatar(name) {
+        // Get initials from name
+        const initials = name.substring(0, 2).toUpperCase();
+        
+        // Generate a consistent color based on the name
+        const hash = Array.from(name).reduce((acc, char) => {
+          return char.charCodeAt(0) + ((acc << 5) - acc);
+        }, 0);
+        
+        const hue = Math.abs(hash % 360);
+        const saturation = 70 + Math.abs(hash % 30);
+        const lightness = 45 + Math.abs(hash % 10);
+        
+        const bgColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        
+        this.groupAvatar = initials;
+        this.groupAvatarColor = bgColor;
+      },
+      
+      // Change theme
+      changeTheme(theme) {
+        this.theme = theme;
+        localStorage.setItem('chatTheme', theme);
+        this.applyTheme(theme);
+        
+        // Broadcast theme change if admin
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'theme',
+            groupId: this.groupId,
+            theme: theme
+          }));
+        }
+      },
+      
+      // Apply theme to the UI
+      applyTheme(theme) {
+        // Remove all theme classes
+        document.body.classList.remove(
+          'theme-default', 
+          'theme-blue', 
+          'theme-green', 
+          'theme-purple', 
+          'theme-dark', 
+          'theme-sunset'
+        );
+        
+        // Add the selected theme class
+        if (theme !== 'default') {
+          document.body.classList.add(`theme-${theme}`);
+        }
+      },
+      
+      // Render the UI based on current state
+      render() {
+        const appElement = document.getElementById('app');
+        
+        if (this.currentPage === 'landing') {
+          appElement.innerHTML = `
+            <div class="header">
+              <h1>Incognito Chatting</h1>
+            </div>
+            <div class="content">
+              <p>Chat freely without revealing your identity!</p>
+              
+              ${this.connectionError ? `
+                <div class="error-message">
+                  <strong>Connection Error</strong>
+                  <p>Cannot connect to the chat server. Please make sure the server is running.</p>
+                </div>
+              ` : ''}
+              
+              <button class="button" id="createGroupBtn" ${this.connectionError ? 'disabled' : ''}>
+                Start Chatting
+              </button>
+              
+              <input type="text" id="groupIdInput" placeholder="Enter Group ID to Join" ${this.connectionError ? 'disabled' : ''}>
+              
+              <button class="button" id="joinGroupBtn" ${this.connectionError ? 'disabled' : ''}>
+                Join Group
+              </button>
+            </div>
+          `;
+          
+          // Add event listeners
+          document.getElementById('createGroupBtn').addEventListener('click', () => this.createGroup());
+          document.getElementById('joinGroupBtn').addEventListener('click', () => {
+            const groupId = document.getElementById('groupIdInput').value;
+            this.joinGroup(groupId);
+          });
+          document.getElementById('groupIdInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              const groupId = document.getElementById('groupIdInput').value;
+              this.joinGroup(groupId);
+            }
+          });
+          
+        } else if (this.currentPage === 'chat') {
+          appElement.innerHTML = `
+            <div class="header">
+              <div class="group-info" style="display: flex; align-items: center; gap: 10px;">
+                <div class="profile-photo" id="groupAvatar" style="background-color: ${this.groupAvatarColor || '#4f46e5'};">
+                  ${this.groupAvatar || this.groupName.substring(0, 2).toUpperCase()}
+                  ${this.isAdmin ? '<div class="profile-photo-edit">✏️</div>' : ''}
+                </div>
+                <h1 style="margin: 0; overflow: hidden; text-overflow: ellipsis; cursor: ${this.isAdmin ? 'pointer' : 'default'};" id="groupNameDisplay" title="${this.isAdmin ? 'Click to change group name' : ''}">
+                  ${this.groupName || `Group: ${this.groupId.substring(0, 8)}...`}
+                </h1>
+              </div>
+              <div class="header-buttons" style="display: flex; gap: 5px;">
+                ${this.isAdmin ? `
+                <div class="dropdown">
+                  <button class="button" id="themeBtn" style="margin: 0; width: auto; background-color: #8b5cf6;">🎨</button>
+                  <div class="dropdown-content">
+                    <a href="#" id="themeDefault">Default</a>
+                    <a href="#" id="themeBlue">Blue</a>
+                    <a href="#" id="themeGreen">Green</a>
+                    <a href="#" id="themePurple">Purple</a>
+                    <a href="#" id="themeDark">Dark</a>
+                    <a href="#" id="themeSunset">Sunset</a>
+                  </div>
+                </div>
+                ` : ''}
+                <div class="dropdown">
+                  <button class="button" id="shareBtn" style="margin: 0; width: auto;">Share</button>
+                  <div class="dropdown-content">
+                    <a href="#" id="copyLinkBtn">Copy Link</a>
+                    <a href="#" id="showQRBtn">Show QR Code</a>
+                    <a href="#" id="shareWhatsApp">WhatsApp</a>
+                    <a href="#" id="shareTelegram">Telegram</a>
+                    <a href="#" id="shareFacebook">Facebook</a>
+                    <a href="#" id="shareTwitter">Twitter</a>
+                    <a href="#" id="shareEmail">Email</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="content">
+              ${this.connectionError ? `
+                <div class="error-message">
+                  <strong>Connection Error</strong>
+                  <p>Lost connection to the server. Messages may not be delivered.</p>
+                </div>
+              ` : ''}
+              
+              <div class="qr-container" id="qrContainer" style="text-align: center; margin-bottom: 15px; display: none;">
+                <h3>Scan to Join</h3>
+                <canvas id="qrcode" style="margin: 0 auto;"></canvas>
+              </div>
+              
+              <style>
+                @media (min-width: 992px) {
+                  #qrcode {
+                    width: 250px !important;
+                    height: 250px !important;
+                  }
+                }
+              </style>
+              
+              <div class="chat-area" id="chatMessages">
+                <div class="message-container">
+                  ${this.messages.map(msg => {
+                    // Process any incoming messages to ensure they're also filtered
+                    const content = msg.type === 'message' ? this.detectSensitiveInfo(msg.content) : msg.content;
+                    
+                    // Add unique ID if not present
+                    if (!msg.id) msg.id = generateUUID();
+                    
+                    return `
+                    <div class="message ${msg.userId === this.userId ? 'sent' : 'received'}" 
+                         style="${msg.color ? `border-left: 4px solid ${msg.color};` : ''}"
+                         data-message-id="${msg.id}">
+                      <button class="reply-button">↩️</button>
+                      <strong>${msg.nickname || `User ${msg.userId.substring(0, 6)}`}</strong>
+                      
+                      ${msg.replyTo ? `
+                        <div class="reply-container">
+                          <strong>${msg.replyTo.nickname || `User ${msg.replyTo.userId.substring(0, 6)}`}:</strong>
+                          ${msg.replyTo.type === 'image' ? '[Image]' : msg.replyTo.content.substring(0, 30) + (msg.replyTo.content.length > 30 ? '...' : '')}
+                        </div>
+                      ` : ''}
+                      
+                      ${msg.type === 'image' 
+                        ? `<img src="${msg.imageUrl}" class="chat-image" style="max-width: 200px; max-height: 200px;">`
+                        : `<p>${content}</p>`
+                      }
+                      <span class="timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                  `;
+                  }).join('')}
+                </div>
+                <div id="typingIndicator" class="typing-indicator" style="font-style: italic; color: #666; margin-top: 5px; min-height: 20px;"></div>
+              </div>
+              
+
+              <div class="message-input">
+                <div id="replyContainer" style="display: none; margin-bottom: 5px;"></div>
+                <div style="position: relative; flex: 1;">
+                  <input type="text" id="messageInput" placeholder="Type a message..." ${this.connectionError ? 'disabled' : ''}>
+                  <button id="clearDraftBtn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; display: none; opacity: 0.6;" title="Clear draft">✕</button>
+                </div>
+                <div class="message-buttons" style="display: flex; gap: 5px;">
+                  <button class="button" id="sendBtn" ${this.connectionError ? 'disabled' : ''}>Send</button>
+                  <button class="button" id="imageBtn" ${this.connectionError ? 'disabled' : ''}>📷</button>
+                  <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                  <button class="button" id="nicknameBtn" ${this.connectionError ? 'disabled' : ''}>👤</button>
+                  ${this.isAdmin ? `<button class="button" id="adminBtn" style="background-color: #ffc107; color: black;">👑</button>` : ''}
+                </div>
+              </div>
+              
+              <div style="margin-top: 20px;">
+                <h3>Members ${this.isAdmin ? '(Admin Controls)' : ''}</h3>
+                <ul class="member-list">
+                  ${this.members.map(member => `
+                    <li style="${member.color ? `border-left: 4px solid ${member.color};` : ''}">
+                      <div>
+                        <span>${member.nickname || `User ${member.id.substring(0, 6)}`}</span>
+                        ${member.muted ? '<span class="muted-badge">🔇</span>' : ''}
+                        ${member.isAdmin ? '<span class="admin-badge">👑 Admin</span>' : ''}
+                        ${member.id === this.userId ? '<span class="self-badge">You</span>' : ''}
+                        ${member.joinedViaQR ? '<span style="color: #4f46e5; font-size: 0.8em;">QR</span>' : ''}
+                      </div>
+                      ${this.isAdmin && member.id !== this.userId ? `
+                        <div class="member-controls">
+                          <button class="kick-btn" data-id="${member.id}" title="Remove user">❌</button>
+                          <button class="mute-btn" data-id="${member.id}" title="${member.muted ? 'Unmute user' : 'Mute user'}">${member.muted ? '🔊' : '🔇'}</button>
+                          ${!member.isAdmin ? `<button class="admin-btn" data-id="${member.id}" title="Make admin">👑</button>` : ''}
+                        </div>
+                      ` : ''}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>
+          `;
+          
+          // Add event listeners
+          document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
+          const messageInput = document.getElementById('messageInput');
+          messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendMessage();
+          });
+          
+          // Add typing indicator events
+          messageInput.addEventListener('input', () => {
+            // Clear any existing timeout
+            if (this.typingTimeout) {
+              clearTimeout(this.typingTimeout);
+            }
+            
+            // Send typing status
+            this.sendTypingStatus(true);
+            
+            // Set timeout to clear typing status after 2 seconds of inactivity
+            this.typingTimeout = setTimeout(() => {
+              this.sendTypingStatus(false);
+            }, 2000);
+            
+            // Show/hide clear draft button
+            const clearDraftBtn = document.getElementById('clearDraftBtn');
+            if (clearDraftBtn) {
+              clearDraftBtn.style.display = messageInput.value.trim() ? 'block' : 'none';
+            }
+          });
+          
+          // Add clear draft button functionality
+          const clearDraftBtn = document.getElementById('clearDraftBtn');
+          if (clearDraftBtn) {
+            clearDraftBtn.addEventListener('click', () => {
+              if (this.clearDraft) {
+                this.clearDraft();
+                this.showToast('Draft cleared');
+              }
+            });
+          }
+          document.getElementById('shareBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const dropdown = document.querySelector('.dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+          });
+          
+          document.getElementById('copyLinkBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareLink();
+            document.querySelector('.dropdown-content').style.display = 'none';
+          });
+          
+          document.getElementById('showQRBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const qrContainer = document.getElementById('qrContainer');
+            qrContainer.style.display = qrContainer.style.display === 'none' ? 'block' : 'none';
+            if (qrContainer.style.display === 'block') {
+              this.generateQRCode();
+            }
+            document.querySelector('.dropdown-content').style.display = 'none';
+          });
+          
+          // Add event listeners for app-specific sharing
+          document.getElementById('shareWhatsApp').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareToApp('whatsapp');
+          });
+          
+          document.getElementById('shareTelegram').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareToApp('telegram');
+          });
+          
+          document.getElementById('shareFacebook').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareToApp('facebook');
+          });
+          
+          document.getElementById('shareTwitter').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareToApp('twitter');
+          });
+          
+          document.getElementById('shareEmail').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.shareToApp('email');
+          });
+          
+          // Image upload
+          const imageInput = document.getElementById('imageInput');
+          document.getElementById('imageBtn').addEventListener('click', () => {
+            if (this.connectionError) {
+              this.showToast('Cannot upload images while offline');
+            } else {
+              imageInput.click();
+            }
+          });
+          imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+              this.uploadImage(e.target.files[0]);
+              e.target.value = ''; // Reset input
+            }
+          });
+          
+
+          
+          // Nickname change
+          document.getElementById('nicknameBtn').addEventListener('click', () => this.changeNickname());
+          
+          // Group name click for admin
+          if (this.isAdmin) {
+            document.getElementById('groupNameDisplay').addEventListener('click', () => {
+              this.changeGroupName();
+            });
+          }
+          
+          // Admin button
+          if (this.isAdmin) {
+            document.getElementById('adminBtn').addEventListener('click', () => {
+              this.showToast('You are the admin. You can manage members in the list below.');
+              // Scroll to member list
+              document.querySelector('.member-list').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Theme buttons
+            document.getElementById('themeDefault').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('default');
+            });
+            
+            document.getElementById('themeBlue').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('blue');
+            });
+            
+            document.getElementById('themeGreen').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('green');
+            });
+            
+            document.getElementById('themePurple').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('purple');
+            });
+            
+            document.getElementById('themeDark').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('dark');
+            });
+            
+            document.getElementById('themeSunset').addEventListener('click', (e) => {
+              e.preventDefault();
+              this.changeTheme('sunset');
+            });
+          }
+          
+          // Add admin control listeners
+          if (this.isAdmin) {
+            // Kick buttons
+            document.querySelectorAll('.kick-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const memberId = btn.getAttribute('data-id');
+                const memberName = this.members.find(m => m.id === memberId)?.nickname || memberId.substring(0, 6);
+                if (confirm(`Are you sure you want to remove ${memberName} from the chat?`)) {
+                  this.kickMember(memberId);
+                }
+              });
+            });
+            
+            // Mute/unmute buttons
+            document.querySelectorAll('.mute-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const memberId = btn.getAttribute('data-id');
+                const memberName = this.members.find(m => m.id === memberId)?.nickname || memberId.substring(0, 6);
+                const isMuted = btn.textContent === '🔇';
+                if (isMuted) {
+                  if (confirm(`Are you sure you want to mute ${memberName}?`)) {
+                    this.muteMember(memberId);
+                  }
+                } else {
+                  this.unmuteMember(memberId);
+                }
+              });
+            });
+            
+            // Make admin buttons
+            document.querySelectorAll('.admin-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const memberId = btn.getAttribute('data-id');
+                const memberName = this.members.find(m => m.id === memberId)?.nickname || memberId.substring(0, 6);
+                if (confirm(`Make ${memberName} an admin? They will have full control over the chat.`)) {
+                  this.makeAdmin(memberId);
+                }
+              });
+            });
+          }
+          
+          // Add swipe-to-reply functionality to messages
+          document.querySelectorAll('.message').forEach(messageEl => {
+            let startX = 0;
+            let currentX = 0;
+            let isSwiping = false;
+            
+            // Touch events for mobile
+            messageEl.addEventListener('touchstart', (e) => {
+              startX = e.touches[0].clientX;
+              isSwiping = true;
+            });
+            
+            messageEl.addEventListener('touchmove', (e) => {
+              if (!isSwiping) return;
+              
+              currentX = e.touches[0].clientX;
+              const diffX = currentX - startX;
+              
+              if (diffX > 10) { // Only swipe right
+                messageEl.classList.add('swiping');
+                e.preventDefault(); // Prevent scrolling while swiping
+              }
+            });
+            
+            messageEl.addEventListener('touchend', () => {
+              isSwiping = false;
+              if (messageEl.classList.contains('swiping')) {
+                messageEl.classList.remove('swiping');
+                const messageId = messageEl.getAttribute('data-message-id');
+                this.setReplyTo(messageId);
+              }
+            });
+            
+            // Mouse events for desktop
+            messageEl.addEventListener('mousedown', (e) => {
+              startX = e.clientX;
+              isSwiping = true;
+            });
+            
+            messageEl.addEventListener('mousemove', (e) => {
+              if (!isSwiping) return;
+              
+              currentX = e.clientX;
+              const diffX = currentX - startX;
+              
+              if (diffX > 30) {
+                messageEl.classList.add('swiping');
+              }
+            });
+            
+            messageEl.addEventListener('mouseup', () => {
+              isSwiping = false;
+              if (messageEl.classList.contains('swiping')) {
+                messageEl.classList.remove('swiping');
+                const messageId = messageEl.getAttribute('data-message-id');
+                this.setReplyTo(messageId);
+              }
+            });
+            
+            messageEl.addEventListener('mouseleave', () => {
+              if (isSwiping) {
+                isSwiping = false;
+                messageEl.classList.remove('swiping');
+              }
+            });
+            
+            // Reply button click
+            const replyBtn = messageEl.querySelector('.reply-button');
+            if (replyBtn) {
+              replyBtn.addEventListener('click', () => {
+                const messageId = messageEl.getAttribute('data-message-id');
+                this.setReplyTo(messageId);
+              });
+            }
+            
+            // Add right-click context menu for reply screen
+            messageEl.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              const messageId = messageEl.getAttribute('data-message-id');
+              const event = new CustomEvent('showReplyScreen', { 
+                detail: { messageId } 
+              });
+              document.dispatchEvent(event);
+            });
+          });
+          
+          // Scroll to bottom of chat
+          const chatArea = document.getElementById('chatMessages');
+          chatArea.scrollTop = chatArea.scrollHeight;
+          
+          // Setup drag and drop for the drop zone
+          const dropZone = document.getElementById('dropZone');
+          if (dropZone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+              dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!this.connectionError) {
+                  dropZone.classList.add('active');
+                }
+              });
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+              dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('active');
+                
+                if (eventName === 'drop' && !this.connectionError && e.dataTransfer.files.length > 0) {
+                  const file = e.dataTransfer.files[0];
+                  if (file.type.startsWith('image/')) {
+                    this.uploadImage(file);
+                  } else {
+                    this.showToast('Only image files are supported');
+                  }
+                } else if (eventName === 'drop' && this.connectionError) {
+                  this.showToast('Cannot upload images while offline');
+                }
+              });
+            });
+          }
+        }
+      }
+    };
+    
+    // Generate a UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    
+    // Initialize the app when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize message replies storage
+      app.messageReplies = {};
+      
+      // Add basic send message functionality
+      app.sendMessage = function(text) {
+        // Get text from input if not provided
+        if (!text) {
+          const messageInput = document.getElementById('messageInput');
+          if (messageInput) {
+            text = messageInput.value.trim();
+          }
+        }
+        
+        // Skip empty messages
+        if (!text || text.length === 0) return false;
+        
+        // Send message to server
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'message',
+            content: text,
+            groupId: this.groupId
+          }));
+          
+          // Clear input field
+          const messageInput = document.getElementById('messageInput');
+          if (messageInput) {
+            messageInput.value = '';
+            messageInput.focus();
+          }
+          
+          return true;
+        } else {
+          this.showToast('Connection lost. Please refresh the page.');
+          return false;
+        }
+      };
+      
+      // Set fixed group name
+      app.groupName = 'Incognito Chatting';
+      
+      app.init();
+    });
+  </script>
+  
+  <!-- Emoji animations and effects -->
+  <link rel="stylesheet" href="emoji-animations.css">
+  <link rel="stylesheet" href="reply-screen.css">
+  <link rel="stylesheet" href="reply-styles.css">
+  <link rel="stylesheet" href="profile-animation.css">
+  <link rel="stylesheet" href="chat-backgrounds.css">
+  <link rel="stylesheet" href="message-animations.css">
+  <link rel="stylesheet" href="smash-effect.css">
+  <link rel="stylesheet" href="user-animations.css">
+  <link rel="stylesheet" href="moderation-styles.css">
+  <link rel="stylesheet" href="modern-buttons.css">
+  <link rel="stylesheet" href="message-bubbles.css">
+  <link rel="stylesheet" href="text-fix.css">
+  <link rel="stylesheet" href="new-theme.css">
+  <link rel="stylesheet" href="input-fix.css">
+  <link rel="stylesheet" href="chat-options.css">
+  <link rel="stylesheet" href="animated-emoji-styles.css">
+  <link rel="stylesheet" href="emoji-action-styles.css">
+  <link rel="stylesheet" href="reactive-emoji.css">
+  <link rel="stylesheet" href="emoji-motion.css">
+  <link rel="stylesheet" href="mute-styles.css">
+  <link rel="stylesheet" href="attractive-messages.css">
+  <link rel="stylesheet" href="admin-mute.css">
+  <style>
+  /* Direct inline style fix for message text */
+  .message p {
+    color: inherit !important;
+    background-color: transparent !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    text-shadow: none !important;
+  }
+  
+  /* Fix for username visibility */
+  .message strong {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    font-weight: bold !important;
+    font-size: 0.9em !important;
+    margin-bottom: 5px !important;
+    text-shadow: none !important;
+  }
+  
+  /* Remove any blinking animations */
+  * {
+    animation-name: none !important;
+  }
+  
+  /* Critical fix for input text visibility */
+  #messageInput, 
+  input[type="text"], 
+  textarea {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    caret-color: #000000 !important;
+  }
+  
+  /* Sound button style */
+  #soundToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #6d28d9;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+  </style>
+  
+  <script>
+  // Fix username visibility and remove any blinking elements
+  window.addEventListener('DOMContentLoaded', function() {
+    // Apply fixes immediately
+    applyFixes();
+    
+    // Set interval to keep checking for new messages
+    setInterval(applyFixes, 500);
+    
+    function applyFixes() {
+      // Fix all usernames in messages
+      document.querySelectorAll('.message strong').forEach(function(strong) {
+        strong.style.visibility = 'visible';
+        strong.style.opacity = '1';
+        strong.style.display = 'block';
+        strong.style.fontWeight = 'bold';
+      });
+      
+      // Fix usernames in sent messages
+      document.querySelectorAll('.message.sent strong').forEach(function(strong) {
+        strong.style.color = '#ffffff';
+      });
+      
+      // Fix usernames in received messages
+      document.querySelectorAll('.message.received strong').forEach(function(strong) {
+        strong.style.color = '#1f2937';
+      });
+      
+      // Fix input text visibility
+      const messageInput = document.getElementById('messageInput');
+      if (messageInput) {
+        messageInput.style.color = '#000000';
+        messageInput.style.backgroundColor = '#ffffff';
+        messageInput.style.visibility = 'visible';
+        messageInput.style.opacity = '1';
+        messageInput.style.caretColor = '#000000';
+      }
+      
+      // Fix all input elements
+      document.querySelectorAll('input, textarea').forEach(function(input) {
+        input.style.color = '#000000';
+        input.style.backgroundColor = '#ffffff';
+        input.style.visibility = 'visible';
+        input.style.opacity = '1';
+        input.style.caretColor = '#000000';
+      });
+      
+      // Remove any blinking animations or sky blue boxes
+      document.querySelectorAll('*').forEach(function(element) {
+        if (window.getComputedStyle(element).backgroundColor === 'rgb(135, 206, 235)' || 
+            window.getComputedStyle(element).backgroundColor === 'skyblue') {
+          element.style.backgroundColor = 'transparent';
+          element.style.animation = 'none';
+        }
+        
+        // Stop any blinking animations
+        if (window.getComputedStyle(element).animationName && 
+            window.getComputedStyle(element).animationName !== 'none') {
+          element.style.animation = 'none';
+        }
+      });
+    }
+  });
+  </script>
+  <!-- TensorFlow.js and Moderation models -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nsfwjs@2.4.2/dist/nsfw.min.js"></script>
+  <script src="content-moderation.js"></script>
+  <script src="image-moderation.js"></script>
+  <script src="auto-moderation.js"></script>
+  <link rel="stylesheet" href="image-viewer.css">
+  <script src="image-viewer.js"></script>
+  <script src="emoji-handler.js"></script>
+  <script src="emoji-reactions.js"></script>
+  <script src="emoji-effects.js"></script>
+  <script src="typing-fix.js"></script>
+  <script src="reply-screen.js"></script>
+  <script src="group-features.js"></script>
+  <script src="group-name-sync.js"></script>
+  <script src="chat-background.js"></script>
+  <script src="rainbow-background.js"></script>
+  <script src="message-animations.js"></script>
+  <script src="smash-effect.js"></script>
+  <script src="user-animations.js"></script>
+  <script src="share-group-id.js"></script>
+  <script src="received-message-animation.js"></script>
+  <script src="direct-text-fix.js"></script>
+  <script src="chat-animations.js"></script>
+  <script src="stop-blinking.js"></script>
+  <script src="fix-input-visibility.js"></script>
+  <script src="indian-content-filter.js"></script>
+  <script src="shared-sounds.js"></script>
+  <script src="chat-options.js"></script>
+  <script src="animated-emoji-option.js"></script>
+  <script src="emoji-action-handler.js"></script>
+  <script src="reactive-emoji.js"></script>
+  <script src="emoji-motion.js">
+  <script src="mute-system.js">
+  <script src="attractive-messages.js">
+  <script src="admin-mute.js">
+  <script src="simple-mute.js">
+  <script src="direct-mute.js">
+  <script src="force-group-name.js"></script>
+
+</body>
+</html>

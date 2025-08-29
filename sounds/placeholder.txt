@@ -1,0 +1,13 @@
+This folder contains sound effects for emoji animations.
+
+Required sound files:
+- whoosh.mp3 (for wave emoji)
+- pop.mp3 (for thumbs up emoji)
+- thud.mp3 (for thumbs down emoji)
+- clap.mp3 (for clap emoji)
+- sizzle.mp3 (for fire emoji)
+- heartbeat.mp3 (for heart emoji)
+- laugh.mp3 (for laugh emoji)
+- party.mp3 (for party emoji)
+
+Place the sound files in this directory for the emoji animations to play sounds.

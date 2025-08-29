@@ -1,0 +1,20 @@
+.group-id-display {
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+.group-id-display:hover {
+  background-color: #e9ecef;
+}
+
+.group-id-display strong {
+  color: #0d6efd;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .group-id-display {
+    font-size: 11px !important;
+    padding: 3px 5px !important;
+  }
+}

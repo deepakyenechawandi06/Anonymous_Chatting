@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anonymous Chat</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #4f46e5;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .error-message {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .success-message {
+      background-color: #dcfce7;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .button:hover {
+      background-color: #4338ca;
+    }
+    .button:disabled {
+      background-color: #a5b4fc;
+      cursor: not-allowed;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    .chat-area {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background-color: #f9fafb;
+    }
+    .message {
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 18px;
+      max-width: 80%;
+      word-break: break-word;
+    }
+    .message.received {
+      background-color: #e5e7eb;
+      align-self: flex-start;
+    }
+    .message.sent {
+      background-color: #dbeafe;
+      margin-left: auto;
+      text-align: right;
+    }
+    .message-container {
+      display: flex;
+      flex-direction: column;
+    }
+    .message-input {
+      display: flex;
+      gap: 8px;
+    }
+    .message-input input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .message-input button {
+      width: auto;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <!-- Content will be dynamically inserted here -->
+  </div>
+
+  <script>
+    // Main application
+    const app = {
+      userId: localStorage.getItem('userId') || generateUUID(),
+      groupId: '',
+      messages: [],
+      ws: null,
+      isAdmin: false,
+      members: [],
+      connectionError: false,
+      currentPage: 'landing',
+      
+      // Initialize the application
+      init() {
+        localStorage.setItem('userId', this.userId);
+        this.connectToServer();
+        this.render();
+        
+        // Check URL parameters for group ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupParam = urlParams.get('group');
+        if (groupParam) {
+          this.groupId = groupParam;
+          this.joinGroup(groupParam);
+        }
+      },
+      
+      // Connect to WebSocket server
+      connectToServer() {
+        try {
+          this.ws = new WebSocket('ws://localhost:8080');
+          
+          this.ws.onopen = () => {
+            console.log('Connected to server');
+            this.connectionError = false;
+            this.render();
+          };
+          
+          this.ws.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              if (data.type === 'message') {
+                this.messages.push(data);
+              } else if (data.type === 'members') {
+                this.members = data.members;
+              } else if (data.type === 'admin') {
+                this.isAdmin = data.isAdmin;
+              }
+              this.render();
+            } catch (err) {
+              console.error('Error parsing message:', err);
+            }
+          };
+          
+          this.ws.onerror = () => {
+            this.connectionError = true;
+            this.render();
+          };
+          
+          this.ws.onclose = () => {
+            this.connectionError = true;
+            this.render();
+          };
+        } catch (err) {
+          this.connectionError = true;
+          this.render();
+        }
+      },
+      
+      // Create a new chat group
+      createGroup() {
+        const newGroupId = generateUUID();
+        this.groupId = newGroupId;
+        this.isAdmin = true;
+        
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'join',
+            groupId: newGroupId,
+            userId: this.userId,
+            isAdmin: true
+          }));
+          this.currentPage = 'chat';
+          this.render();
+        } else {
+          alert('Cannot connect to server. Please make sure the server is running.');
+        }
+      },
+      
+      // Join an existing chat group
+      joinGroup(id) {
+        if (!id.trim()) {
+          alert('Please enter a valid Group ID');
+          return;
+        }
+        
+        this.groupId = id;
+        
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'join',
+            groupId: id,
+            userId: this.userId,
+            isAdmin: false
+          }));
+          this.currentPage = 'chat';
+          this.render();
+        } else {
+          alert('Cannot connect to server. Please make sure the server is running.');
+        }
+      },
+      
+      // Send a message
+      sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        
+        if (message && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'message',
+            groupId: this.groupId,
+            userId: this.userId,
+            content: message
+          }));
+          messageInput.value = '';
+        }
+      },
+      
+      // Kick a member (admin only)
+      kickMember(memberId) {
+        if (this.isAdmin && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'kick',
+            groupId: this.groupId,
+            userId: memberId
+          }));
+        }
+      },
+      
+      // Share the group link
+      shareLink() {
+        const url = `${window.location.origin}${window.location.pathname}?group=${this.groupId}`;
+        
+        // Create a temporary input to copy the URL
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        // Show confirmation
+        alert(`Link copied to clipboard: ${url}\nShare this link with others to join your chat.`);
+        
+        // Try native sharing if available (mobile devices)
+        try {
+          if (navigator.share) {
+            navigator.share({
+              title: 'Anonymous Chat',
+              text: 'Join my anonymous chat group!',
+              url: url
+            }).catch(err => console.log('Share failed:', err));
+          }
+        } catch (err) {
+          console.log('Share API not supported');
+        }
+      },
+      
+      // Render the UI based on current state
+      render() {
+        const appElement = document.getElementById('app');
+        
+        if (this.currentPage === 'landing') {
+          appElement.innerHTML = `
+            <div class="header">
+              <h1>Anonymous Chat</h1>
+            </div>
+            <div class="content">
+              <p>Chat freely without revealing your identity!</p>
+              
+              ${this.connectionError ? `
+                <div class="error-message">
+                  <strong>Connection Error</strong>
+                  <p>Cannot connect to the chat server. Please make sure the server is running.</p>
+                </div>
+              ` : ''}
+              
+              <button class="button" id="createGroupBtn" ${this.connectionError ? 'disabled' : ''}>
+                Start Chatting
+              </button>
+              
+              <input type="text" id="groupIdInput" placeholder="Enter Group ID to Join" ${this.connectionError ? 'disabled' : ''}>
+              
+              <button class="button" id="joinGroupBtn" ${this.connectionError ? 'disabled' : ''}>
+                Join Group
+              </button>
+            </div>
+          `;
+          
+          // Add event listeners
+          document.getElementById('createGroupBtn').addEventListener('click', () => this.createGroup());
+          document.getElementById('joinGroupBtn').addEventListener('click', () => {
+            const groupId = document.getElementById('groupIdInput').value;
+            this.joinGroup(groupId);
+          });
+          
+        } else if (this.currentPage === 'chat') {
+          appElement.innerHTML = `
+            <div class="header">
+              <h1>Group: ${this.groupId.substring(0, 8)}...</h1>
+              <button class="button" id="shareBtn" style="margin-top: 10px;">Share Link</button>
+            </div>
+            <div class="content">
+              ${this.connectionError ? `
+                <div class="error-message">
+                  <strong>Connection Error</strong>
+                  <p>Lost connection to the server. Messages may not be delivered.</p>
+                </div>
+              ` : ''}
+              
+              <div class="chat-area" id="chatMessages">
+                <div class="message-container">
+                  ${this.messages.map(msg => `
+                    <div class="message ${msg.userId === this.userId ? 'sent' : 'received'}">
+                      <strong>User ${msg.userId.substring(0, 6)}</strong>
+                      <p>${msg.content}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="message-input">
+                <input type="text" id="messageInput" placeholder="Type a message..." ${this.connectionError ? 'disabled' : ''}>
+                <button class="button" id="sendBtn" ${this.connectionError ? 'disabled' : ''}>Send</button>
+              </div>
+              
+              ${this.isAdmin ? `
+                <div style="margin-top: 20px;">
+                  <h3>Members</h3>
+                  <ul>
+                    ${this.members.map(member => `
+                      <li>
+                        User ${member.substring(0, 6)}
+                        ${member !== this.userId ? `
+                          <button class="kick-btn" data-id="${member}">Kick</button>
+                        ` : ''}
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          `;
+          
+          // Add event listeners
+          document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
+          document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendMessage();
+          });
+          document.getElementById('shareBtn').addEventListener('click', () => this.shareLink());
+          
+          // Add kick button listeners if admin
+          if (this.isAdmin) {
+            document.querySelectorAll('.kick-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const memberId = btn.getAttribute('data-id');
+                this.kickMember(memberId);
+              });
+            });
+          }
+          
+          // Scroll to bottom of chat
+          const chatArea = document.getElementById('chatMessages');
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }
+      }
+    };
+    
+    // Generate a UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    
+    // Initialize the app when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>

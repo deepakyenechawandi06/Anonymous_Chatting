@@ -1,0 +1,53 @@
+/* Fix for white text on white background */
+body {
+  color: #333;
+}
+
+.message {
+  color: #1f2937;
+}
+
+.message.sent {
+  color: white;
+}
+
+.message.received {
+  color: #1f2937;
+}
+
+/* Dark theme text fixes */
+.theme-dark {
+  color: #f3f4f6;
+}
+
+.theme-dark .message {
+  color: #f3f4f6;
+}
+
+.theme-dark .message.received {
+  color: #f3f4f6;
+}
+
+.theme-dark .content {
+  color: #f3f4f6;
+}
+
+.theme-dark input, 
+.theme-dark textarea {
+  color: #f3f4f6;
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.theme-dark .member-list li {
+  color: #f3f4f6;
+  background-color: #374151;
+}
+
+/* Fix for other themes */
+.theme-blue .message.received,
+.theme-green .message.received,
+.theme-purple .message.received,
+.theme-sunset .message.received {
+  color: #1f2937;
+}

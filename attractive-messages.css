@@ -1,0 +1,193 @@
+/* Attractive Message Styles */
+
+/* Message entrance animation */
+.message-entrance {
+  animation: messageSlideIn 0.5s ease-out;
+}
+
+/* Sent message effects */
+.message.sent {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transform: translateX(0);
+  animation: sentMessagePop 0.6s ease-out;
+}
+
+/* Received message effects */
+.message.received {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+  animation: receivedMessageBounce 0.6s ease-out;
+}
+
+/* Sparkle effect for sent messages */
+.sparkle-effect {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 20px;
+  animation: sparkleFloat 2s ease-out;
+  pointer-events: none;
+}
+
+/* Heart effect for received messages */
+.heart-effect {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  font-size: 18px;
+  animation: heartFloat 2s ease-out;
+  pointer-events: none;
+}
+
+/* Glow effect for received messages */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(240, 147, 251, 0.8) !important;
+  animation: glowPulse 1s ease-out;
+}
+
+/* Pulse effect */
+.pulse-effect {
+  animation: messagePulse 0.8s ease-out;
+}
+
+/* Vibration effects */
+.vibrate-sent {
+  animation: vibrateSent 0.6s ease-out;
+}
+
+.vibrate-received {
+  animation: vibrateReceived 1s ease-out;
+}
+
+/* Animations */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sentMessagePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateX(50px);
+  }
+  70% {
+    transform: scale(1.05) translateX(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes receivedMessageBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateX(-50px);
+  }
+  50% {
+    transform: scale(1.1) translateX(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes sparkleFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) rotate(180deg);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(240, 147, 251, 0.8);
+  }
+}
+
+@keyframes heartFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.5);
+  }
+}
+
+@keyframes messagePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes vibrateSent {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-2px) rotate(1deg); }
+  20% { transform: translateX(2px) rotate(-1deg); }
+  30% { transform: translateX(-2px) rotate(1deg); }
+  40% { transform: translateX(2px) rotate(-1deg); }
+  50% { transform: translateX(-1px) rotate(0.5deg); }
+  60% { transform: translateX(1px) rotate(-0.5deg); }
+  70% { transform: translateX(-1px) rotate(0.5deg); }
+  80% { transform: translateX(1px) rotate(-0.5deg); }
+  90% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes vibrateReceived {
+  0%, 100% { transform: translateY(0) scale(1); }
+  5% { transform: translateY(-1px) scale(1.02); }
+  10% { transform: translateY(1px) scale(0.98); }
+  15% { transform: translateY(-1px) scale(1.02); }
+  20% { transform: translateY(1px) scale(0.98); }
+  25% { transform: translateY(-1px) scale(1.01); }
+  30% { transform: translateY(1px) scale(0.99); }
+  35% { transform: translateY(-1px) scale(1.01); }
+  40% { transform: translateY(1px) scale(0.99); }
+  45% { transform: translateY(0) scale(1); }
+}
+
+/* Enhanced message styling */
+.message {
+  position: relative;
+  border-radius: 18px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  max-width: 70%;
+  word-wrap: break-word;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message p {
+  margin: 0;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.message strong {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600;
+}

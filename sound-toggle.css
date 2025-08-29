@@ -1,0 +1,44 @@
+/* Sound toggle button styles */
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+  user-select: none;
+}
+
+.sound-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.sound-toggle span {
+  font-size: 18px;
+}
+
+/* Sound toggle position in header */
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.header .sound-toggle {
+  margin-left: auto;
+}
+
+/* Sound animation */
+@keyframes soundWave {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+.sound-active {
+  animation: soundWave 1s 1;
+}

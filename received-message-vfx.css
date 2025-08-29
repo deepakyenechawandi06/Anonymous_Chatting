@@ -1,0 +1,28 @@
+/* Enhanced received message animations and colors */
+.message.received {
+  animation: slideInLeft 0.4s ease-out forwards;
+  background: linear-gradient(135deg, #f0f4f8, #d8e3f0) !important;
+  border-left: 3px solid #4a90e2 !important;
+}
+
+@keyframes slideInLeft {
+  0% { 
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Add subtle pulse effect when new message arrives */
+.message.received.new-message {
+  animation: slideInLeft 0.4s ease-out forwards, pulse 1.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(74, 144, 226, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
+}

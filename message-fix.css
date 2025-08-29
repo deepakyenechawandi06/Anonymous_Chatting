@@ -1,0 +1,37 @@
+/* Fix for received message background and animations */
+.message.received {
+  background-color: #ffffff !important;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Theme-specific received message styles */
+.theme-blue .message.received {
+  background-color: #e0f2fe !important;
+}
+
+.theme-green .message.received {
+  background-color: #d1fae5 !important;
+}
+
+.theme-purple .message.received {
+  background-color: #ede9fe !important;
+}
+
+.theme-dark .message.received {
+  background-color: #4b5563 !important;
+}
+
+.theme-sunset .message.received {
+  background-color: #ffedd5 !important;
+}

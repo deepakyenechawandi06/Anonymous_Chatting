@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Connection Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #0069d9;
+    }
+    .steps {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Connection Test</h1>
+  
+  <div id="serverStatus" class="status warning">
+    Checking server status...
+  </div>
+  
+  <div>
+    <button id="testConnection">Test Connection</button>
+    <button id="checkPort">Check Port 8080</button>
+  </div>
+  
+  <h2>Connection Details</h2>
+  <pre id="connectionDetails"></pre>
+  
+  <div class="steps">
+    <h3>Troubleshooting Steps</h3>
+    <ol>
+      <li>Make sure the server is running by executing <code>npm start</code> in the command prompt</li>
+      <li>Check if port 8080 is already in use by another application</li>
+      <li>Try using the test server: <code>node test-server.js</code></li>
+      <li>Check if your firewall is blocking WebSocket connections</li>
+      <li>Try accessing the chat from the same device running the server</li>
+    </ol>
+  </div>
+  
+  <script>
+    // Display connection details
+    const hostname = window.location.hostname || 'localhost';
+    const connectionDetails = document.getElementById('connectionDetails');
+    connectionDetails.textContent = `
+Hostname: ${hostname} ${hostname === 'localhost' ? '(using localhost as fallback)' : ''}
+Protocol: ${window.location.protocol}
+Port: ${window.location.port || '80'}
+WebSocket URL: ws://${hostname}:8080
+    `;
+    
+    // Test connection function
+    function testWebSocketConnection() {
+      const serverStatus = document.getElementById('serverStatus');
+      serverStatus.className = 'status warning';
+      serverStatus.textContent = 'Attempting to connect...';
+      
+      try {
+        // Use localhost if hostname is empty (when opening file directly)
+        const hostname = window.location.hostname || 'localhost';
+        const ws = new WebSocket(`ws://${hostname}:8080`);
+        
+        ws.onopen = () => {
+          serverStatus.className = 'status success';
+          serverStatus.textContent = 'Successfully connected to WebSocket server!';
+          
+          // Send a test message
+          ws.send(JSON.stringify({
+            type: 'message',
+            content: 'Test message from connection tester'
+          }));
+        };
+        
+        ws.onmessage = (event) => {
+          serverStatus.innerHTML += `<br>Received message: ${event.data}`;
+        };
+        
+        ws.onerror = (error) => {
+          serverStatus.className = 'status error';
+          serverStatus.innerHTML = `
+            <strong>Connection Error</strong>
+            <p>Failed to connect to WebSocket server. This usually means:</p>
+            <ul>
+              <li>The server is not running</li>
+              <li>Port 8080 is blocked by a firewall</li>
+              <li>The server is running on a different port</li>
+            </ul>
+          `;
+        };
+        
+        ws.onclose = () => {
+          serverStatus.innerHTML += '<br>Connection closed';
+        };
+        
+        // Set a timeout
+        setTimeout(() => {
+          if (ws.readyState !== WebSocket.OPEN) {
+            serverStatus.className = 'status error';
+            serverStatus.innerHTML = `
+              <strong>Connection Timeout</strong>
+              <p>Could not establish connection within 5 seconds.</p>
+            `;
+          }
+        }, 5000);
+        
+      } catch (err) {
+        serverStatus.className = 'status error';
+        serverStatus.textContent = `Error: ${err.message}`;
+      }
+    }
+    
+    // Check if port 8080 is accessible
+    function checkPort() {
+      const serverStatus = document.getElementById('serverStatus');
+      serverStatus.className = 'status warning';
+      serverStatus.textContent = 'Checking port 8080...';
+      
+      // Use localhost if hostname is empty (when opening file directly)
+      const hostname = window.location.hostname || 'localhost';
+      
+      // Try to make a simple HTTP request to port 8080
+      fetch(`http://${hostname}:8080`)
+        .then(response => {
+          serverStatus.className = 'status success';
+          serverStatus.innerHTML = `
+            <strong>Port 8080 is accessible</strong>
+            <p>HTTP request succeeded with status: ${response.status}</p>
+            <p>This means the server is running and the port is open.</p>
+          `;
+        })
+        .catch(error => {
+          serverStatus.className = 'status error';
+          serverStatus.innerHTML = `
+            <strong>Port 8080 is not accessible</strong>
+            <p>Error: ${error.message}</p>
+            <p>This could mean:</p>
+            <ul>
+              <li>The server is not running</li>
+              <li>The port is blocked by a firewall</li>
+              <li>The server is only accepting WebSocket connections</li>
+            </ul>
+          `;
+        });
+    }
+    
+    // Add event listeners
+    document.getElementById('testConnection').addEventListener('click', testWebSocketConnection);
+    document.getElementById('checkPort').addEventListener('click', checkPort);
+    
+    // Run the test automatically
+    testWebSocketConnection();
+  </script>
+</body>
+</html>
