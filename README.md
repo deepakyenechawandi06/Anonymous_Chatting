@@ -5,10 +5,10 @@ A simple incognito chatting application using WebSockets.
 ## Screenshots
 
 ### Main Chat Interface
-![Main Chat Interface](Screenshot%202025-06-15%20154607.png)
+![Admin Controls](https://github.com/deepakyenechawandi06/Anonymous_Chatting/blob/main/screenshots/home.png)
 
 ### Group Management & Admin Features
-![Admin Controls](screenshots/Screenshot%202025-08-29%20131441.png)
+![Main Chat Interface](https://github.com/deepakyenechawandi06/Anonymous_Chatting/blob/main/screenshots/chat-page.png)
 
 
 ## Setup Instructions
